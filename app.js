@@ -34,7 +34,7 @@ for(var i = 0; i < fields.length; i++) {
             }
         }
         else if(objElement.mandatory == 2){
-            let err1 = checkSpecial(obj.tag, objElement, val);
+            let err1 = checkSpecial(obj.tag, objElement, val, wire);
             if(err1 !== null){
                 errorMsg = errorMsg+err1+" ";
             }
@@ -84,18 +84,37 @@ function checkOptional(tag, objElement, val){
     return err;
 }
 
-function checkSpecial(tag, objElement, val){
+function checkSpecial(tag, objElement, val, wire){
     console.log("checkSpecial: tag =" + tag + " objElement=" + JSON.stringify(objElement) + " val=" + val);
     
     let err = null;
+    let rule = "";
     if(objElement.desc !== "" && objElement.desc !== null){
         let rulesArr = objElement.desc.split(";");
         if(rulesArr.length>0){
             for(let k=0; k<rulesArr.length; k++){
-                let rule = rulesArr[k];
-                console.log(rule);
+                rule = rulesArr[k];
+                err = getErrorByRule(rule, wire, tag, objElement, val);
             }
+        } else {
+            rule = objElement.desc;
+            err = getErrorByRule(rule, wire, tag, objElement, val);
         }
     }
     return err;
+}
+
+function getErrorByRule(rule, wire, tag, objElement, val){
+    if(rule !== null && rule !== ""){
+        console.log("Processing this : "+rule);
+        let n = rule.includes("only allowed");
+        if(n === true){
+            let conditionSt = rule.split("if")[1];
+            let condArr = conditionSt.split("AND");
+            for(let k=0; k<condArr.length; k++){
+                let condition = condArr[k].trim();
+                console.log(condition);
+            }
+        }
+    }
 }
