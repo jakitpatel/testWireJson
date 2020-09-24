@@ -223,7 +223,7 @@
          "length":35,
          "name":"proprietaryCode",
          "delimiter":"*",
-         "mandatory":0,
+         "mandatory":2,
          "value":"",
          "desc":"only allowed if 3610.localInstrumentCode = PROP"
       }
