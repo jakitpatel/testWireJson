@@ -529,6 +529,8 @@ function verify4200(tag, elementArr, wire) {
     let intermediaryFICode = wire['intermediaryFICode'];
     let beneficiaryFICode = wire['beneficiaryFICode'];
     let busFunCode = wire['businessFunctionCode'];
+
+    let originToBeneficiaryInfo1 = wire['originToBeneficiaryInfo1'];
     for(var j = 0; j < elementArr.length; j++) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
@@ -565,6 +567,10 @@ function verify4200(tag, elementArr, wire) {
             errTag = errTag + checkMandatory(tag, objElement, val)+" ";
         }
         if(busFunCode=="CTR" || busFunCode=="CTP" || busFunCode=="DRW" || busFunCode=="DRC"){
+            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+        }
+        // If 6000 is present then 4200 is mandatory
+        if(typeof originToBeneficiaryInfo1 !== 'undefined' && originToBeneficiaryInfo1!== null && originToBeneficiaryInfo1!== ""){
             errTag = errTag + checkMandatory(tag, objElement, val)+" ";
         }
     }
@@ -638,6 +644,996 @@ function verify4400(tag, elementArr, wire) {
     return errTag;
 }
 
+function verify5000(tag, elementArr, wire) {
+    /*{5000} : Originator
+        ID Code (B, C, D, F, T, U, 1, 2, 3, 4, 5, 9) Identifier (34 characters)
+        Name (35 characters)
+        Address (3 lines of 35 characters each)
+        Mandatory when {3600} is CTR or CTP if {5010} is not present.
+        If ID Code is present, Identifier is mandatory and vice versa.
+        If ID Code is ‘T’:
+         {3600} must be CTR or CTP.
+         Identifier must be present and should
+        contain an account number.
+         Name must be present and should contain a SWIFT BIC or BEI, which will be edited for proper structure.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let originatorFICode = wire['originatorFICode'];
+    let originatorFIIdentifier = wire['originatorFIIdentifier'];
+    let instructingFICode = wire['instructingFICode'];
+    let instructingFIIdentifier = wire['instructingFIIdentifier'];
+    let originToBeneficiaryInfo1 = wire['originToBeneficiaryInfo1'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        let originatorCode = wire['originatorCode'];
+        let originatorIdentifier = wire['originatorIdentifier'];
+        let originatorName = wire['originatorName'];
+        if(objElement.name === "originatorCode"){
+            if(typeof originatorCode !== 'undefined' && originatorCode!== null && originatorCode!== ""){
+                errTag = errTag + checkMandatory(tag, elementArr[1], originatorIdentifier)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[0], originatorCode)+" ";
+            }
+        } else if(objElement.name === "originatorIdentifier"){
+            if(typeof originatorIdentifier !== 'undefined' && originatorIdentifier!== null && originatorIdentifier!== ""){
+                errTag = errTag + checkMandatory(tag, elementArr[0], originatorCode)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[1], originatorIdentifier)+" ";
+            }
+        } else if(objElement.name === "originatorName"){
+            if(typeof originatorName !== 'undefined' && originatorName!== null && originatorName!== ""){
+                if(originatorCode == "T"){
+                    errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+                    let n = val.includes("SWIFT, BIC, BEI");
+                    if(n==false){
+                        errTag = errTag + tag+ ": originatorName : should contain a SWIFT BIC or BEI if originatorCode = T; ";
+                    }
+                    if(busFunCode!=="CTR" && busFunCode!=="CTP"){
+                        errTag = errTag + tag+ ": 3600.businessFunctionCode must be CTR OR CTP if beneficiaryCode = T; ";
+                    }
+                }
+            }
+        } else {
+            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        }
+        // If 5100 is present then 5000 is mandatory
+        if(typeof originatorFICode !== 'undefined' && originatorFICode!== null && originatorFICode!== ""){
+            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+        }
+        // If 5200 is present then 5000 is mandatory
+        if(typeof instructingFICode !== 'undefined' && instructingFICode!== null && instructingFICode!== ""){
+            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+        }
+        // Also check if 5010 is not present
+        if(busFunCode=="CTR" || busFunCode=="CTP"){
+            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+        }
+        // If 6000 is present then 5000 is mandatory
+        if(typeof originToBeneficiaryInfo1 !== 'undefined' && originToBeneficiaryInfo1!== null && originToBeneficiaryInfo1!== ""){
+            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+        }
+    }
+    return errTag;
+}
+
+function verify5010(tag, elementArr, wire) {
+    /*{5010} : Originator Option F
+    Party Identifier (35 characters)
+    Must be one of the following two formats:
+    1. 2.
+    /Account Number (slash followed by at least one valid non-space character: e.g., /123456)
+    Unique Identifier/ (4 character code followed by a slash and at least one valid non-space character: e.g., SOSE/123-456-789)
+    ARNU/ CCPT/ CUST/ DRLC/ EMPL/ NIDN/ SOSE/ TXID/
+    Alien Registration Number Passport Number
+    Customer Identification Number Driver’s License Number Employer Number
+    National Identify Number Social Security Number Tax Identification Number
+    Name (35 characters)
+    Format: Must begin with Line Code 1 followed by a slash and at least one valid non-space character: e.g., 1/SMITH JOHN.
+    Line 1 to 3 (35 characters each)
+    Format: Each line, if present, must begin with one of the following Line Codes followed by a slash and at least one valid non-space character.
+    1 Name
+    2 Address
+    3 Country and Town
+    4 Date of Birth
+    5 Place of Birth
+    6 Customer Identification Number
+    7 National Identity Number
+    8 Additional Information
+    For example:
+    2/123 MAIN STREET 3/US/NEW YORK, NY 10000 7/111-22-3456
+    Mandatory when {3600} is CTP and {5000} is not present; otherwise not permitted.
+    Party Identifier and Name are mandatory.
+    If present, Line 1, Line 2 and Line 3 must adhere to the following edits:
+     Each line must begin with one of the
+    numeric line codes in numerical order.
+     Codes 1 and 2 can be repeated.
+     Codes3,4,5,6,7and8cannotbe repeated.
+     Code 2 cannot be used without Code 3.
+     Code 4 cannot be used without Code 5
+    and vice versa.
+     Code 8 can only be used to continue information from one of the following: Party Identifier (if Unique Identifier used), Code 6 or Code 7.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let originatorCode = wire['originatorCode'];
+    let originatorIdentifier = wire['originatorIdentifier'];
+    let originatorName = wire['originatorName'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        let partyID = wire['partyID'];
+        let partyIDUniqeIDType = wire['partyIDUniqeIDType'];
+        let partyName = wire['partyName'];
+        // Also check if 5000 is not present
+        if(busFunCode=="CTP" && originatorCode==="" && originatorCode===null){
+            if(objElement.name === "partyID" || objElement.name === "partyIDUniqeIDType" || objElement.name === "partyName"){
+                errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            } else {
+                errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            }
+        } else {
+            if(typeof partyName !== 'undefined' && partyName!== null && partyName!== ""){
+                errTag = errTag + tag+ ": partyName is not allowed if 3600.businessFunctionCode is not CTP & {5000} is present; ";
+            }
+            if(typeof partyID !== 'undefined' && partyID!== null && partyID!== ""){
+                errTag = errTag + tag+ ": partyID is not allowed if 3600.businessFunctionCode is not CTP & {5000} is present; ";
+            }
+            if(typeof partyIDUniqeIDType !== 'undefined' && partyIDUniqeIDType!== null && partyIDUniqeIDType!== ""){
+                errTag = errTag + tag+ ": partyIDUniqeIDType is not allowed if 3600.businessFunctionCode is not CTP & {5000} is present; ";
+            }
+        }
+    }
+    return errTag;
+}
+
+function verify5100(tag, elementArr, wire) {
+    /*{5100} : Originator FI
+        ID Code (B, C, D, F, U)
+        Identifier (34 characters)
+        Name (35 characters)
+        Address (3 lines of 35 characters each)
+        If present, {5000} (or {5010} if {3600} is CTP) is mandatory.
+        If ID Code is present, Identifier is mandatory and vice versa.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let instructingFICode = wire['instructingFICode'];
+    let instructingFIIdentifier = wire['instructingFIIdentifier'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        let originatorFICode = wire['originatorFICode'];
+        let originatorFIIdentifier = wire['originatorFIIdentifier'];
+        if(objElement.name === "originatorFICode"){
+            if(typeof originatorFICode !== 'undefined' && originatorFICode!== null && originatorFICode!== ""){
+                errTag = errTag + checkMandatory(tag, elementArr[1], originatorFIIdentifier)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[0], originatorFICode)+" ";
+            }
+        } else if(objElement.name === "originatorFIIdentifier"){
+            if(typeof originatorFIIdentifier !== 'undefined' && originatorFIIdentifier!== null && originatorFIIdentifier!== ""){
+                errTag = errTag + checkMandatory(tag, elementArr[0], originatorFICode)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[1], originatorFIIdentifier)+" ";
+            }
+        } else {
+            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        }
+        // If 5200 is present then 5100 is mandatory
+        if(typeof instructingFICode !== 'undefined' && instructingFICode!== null && instructingFICode!== ""){
+            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+        }
+    }
+    return errTag;
+}
+
+function verify5200(tag, elementArr, wire) {
+    /*{5200} : Instructing FI
+        ID Code (B, C, D, F, U)
+        Identifier (34 characters)
+        Name (35 characters)
+        Address (3 lines of 35 characters each)
+        If present, {5000} (or {5010} if {3600} is CTP) and {5100} are mandatory.
+        If ID Code is present, Identifier is mandatory and vice versa.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        let instructingFICode = wire['instructingFICode'];
+        let instructingFIIdentifier = wire['instructingFIIdentifier'];
+        if(objElement.name === "instructingFICode"){
+            if(typeof instructingFICode !== 'undefined' && instructingFICode!== null && instructingFICode!== ""){
+                errTag = errTag + checkMandatory(tag, elementArr[1], instructingFIIdentifier)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[0], instructingFICode)+" ";
+            }
+        } else if(objElement.name === "instructingFIIdentifier"){
+            if(typeof instructingFIIdentifier !== 'undefined' && instructingFIIdentifier!== null && instructingFIIdentifier!== ""){
+                errTag = errTag + checkMandatory(tag, elementArr[0], instructingFICode)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[1], instructingFIIdentifier)+" ";
+            }
+        } else {
+            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        }
+    }
+    return errTag;
+}
+
+function verify5400(tag, elementArr, wire) {
+    /*{5400} Account Credited in Drawdown
+        Drawdown Credit Account Number (9 character ABA)
+        Mandatory when {3600} is DRB or DRC, but can also be present for DRW or SVC; otherwise not permitted.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let accountCreditedDrawdown = wire['accountCreditedDrawdown'];
+    if(busFunCode === "DRB" || busFunCode === "DRC"){
+        errTag = errTag + checkMandatory(tag, elementArr[0], accountCreditedDrawdown)+" ";
+    }
+    if(busFunCode !== "DRB" && busFunCode !== "DRC" && busFunCode !== "DRW" && busFunCode !== "SVC"){
+        if(typeof accountCreditedDrawdown !== 'undefined' && accountCreditedDrawdown!== null && accountCreditedDrawdown!== ""){
+            errTag = errTag + tag+ ": accountCreditedDrawdown only allowed if 3600.businessFunctionCode must be DRB, DRC, DRW OR SVC; ";
+        }
+    }
+    return errTag;
+}
+
+function verify6000(tag, elementArr, wire) {
+    /*{6000} : Originator to Beneficiary Information
+        (up to 4 lines of 35 characters each)
+        If present, {4200} and {5000} (or {5010} if {3600} is CTP) are mandatory.
+        See latest version of the FAIM manual for Line Limits for Tags {6000} to {6500}.*/
+    let errTag = "";
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+    }
+    return errTag;
+}
+
+function verify6100(tag, elementArr, wire) {
+    /*{6100} Receiver FI Information
+        1 line of 30 characters, plus up to 5 lines of 33 characters each*/
+    let errTag = "";
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+    }
+    return errTag;
+}
+
+function verify6110(tag, elementArr, wire) {
+    /*{6110} : Drawdown Debit Account Advice Information
+        Advice Code (LTR, PHN, TLX or WRE)
+        Additional Information (1 line of 26 characters, plus up to 5 lines of 33 characters each)
+        Can only be used if {3600} is DRB, DRC, DRW or SVC; otherwise not permitted.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        let drawdownDebitAcctCode = wire['drawdownDebitAcctCode'];
+        if(objElement.name === "drawdownDebitAcctCode"){
+            if(typeof drawdownDebitAcctCode !== 'undefined' && drawdownDebitAcctCode!== null && drawdownDebitAcctCode!== ""){
+                errTag = errTag + checkMandatory(tag, objElement, drawdownDebitAcctCode)+" ";
+            }
+        } else {
+            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        }
+        if(busFunCode!=="DRB" && busFunCode!=="DRC" && busFunCode!=="DRW" && busFunCode!=="SVC"){
+            if(typeof val !== 'undefined' && val!== null && val!== ""){
+                errTag = errTag + tag+ ": "+objElement.name+" only allowed if 3600.businessFunctionCode must be DRB, DRC, DRW OR SVC; ";
+            }
+        }
+    }
+    return errTag;
+}
+
+function verify6200(tag, elementArr, wire) {
+    /*{6200} Intermediary FI Information
+        1 line of 30 characters, plus up to 5 lines of 33 characters each.
+        If present, {4000}, {4100} and {4200} are required.*/
+    let errTag = "";
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        if(typeof val !== 'undefined' && val!== null && val!== ""){
+            // Check 4000, 4100, 4200 exist or not
+            let intermediaryFICode = wire['intermediaryFICode'];
+            if(typeof intermediaryFICode == 'undefined' && intermediaryFICode== null && intermediaryFICode== ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is present then {4000} must be present; ";
+            }
+            let beneficiaryFICode = wire['beneficiaryFICode'];
+            if(typeof beneficiaryFICode == 'undefined' && beneficiaryFICode == null && beneficiaryFICode == ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is present then {4100} must be present; ";
+            }
+            let beneficiaryCode = wire['beneficiaryCode'];
+            if(typeof beneficiaryCode == 'undefined' && beneficiaryCode == null && beneficiaryCode == ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is present then {4200} must be present; ";
+            }
+        }
+    }
+    return errTag;
+}
+
+function verify6210(tag, elementArr, wire) {
+    /*{6210} : Intermediary FI Advice Information
+        Advice Code (LTR, PHN, TLX or WRE)
+        Additional Information (1 line of 26 characters, plus up to 5 lines of 33 characters each)
+        If present, {4000}, {4100} and {4200} are required.*/
+    let errTag = "";
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        let intermediaryFIAdviceCode = wire['intermediaryFIAdviceCode'];
+        if(objElement.name === "intermediaryFIAdviceCode"){
+            if(typeof intermediaryFIAdviceCode !== 'undefined' && intermediaryFIAdviceCode!== null && intermediaryFIAdviceCode!== ""){
+                errTag = errTag + checkMandatory(tag, objElement, intermediaryFIAdviceCode)+" ";
+            }
+        } else {
+            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        }
+        if(typeof val !== 'undefined' && val!== null && val!== ""){
+            // Check 4000, 4100, 4200 exist or not
+            let intermediaryFICode = wire['intermediaryFICode'];
+            if(typeof intermediaryFICode == 'undefined' && intermediaryFICode== null && intermediaryFICode== ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is present then {4000} must be present; ";
+            }
+            let beneficiaryFICode = wire['beneficiaryFICode'];
+            if(typeof beneficiaryFICode == 'undefined' && beneficiaryFICode == null && beneficiaryFICode == ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is present then {4100} must be present; ";
+            }
+            let beneficiaryCode = wire['beneficiaryCode'];
+            if(typeof beneficiaryCode == 'undefined' && beneficiaryCode == null && beneficiaryCode == ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is present then {4200} must be present; ";
+            }
+        }
+    }
+    return errTag;
+}
+
+function verify6300(tag, elementArr, wire) {
+    /*{6300} Beneficiary’s FI Information
+        1 line 30 characters, plus up to 5 lines of 33 characters each.
+        If present, {4100} and {4200} are required.*/
+    let errTag = "";
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        if(typeof val !== 'undefined' && val!== null && val!== ""){
+            // Check 4100, 4200 exist or not
+            let beneficiaryFICode = wire['beneficiaryFICode'];
+            if(typeof beneficiaryFICode == 'undefined' && beneficiaryFICode == null && beneficiaryFICode == ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is present then {4100} must be present; ";
+            }
+            let beneficiaryCode = wire['beneficiaryCode'];
+            if(typeof beneficiaryCode == 'undefined' && beneficiaryCode == null && beneficiaryCode == ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is present then {4200} must be present; ";
+            }
+        }
+    }
+    return errTag;
+}
+
+function verify6310(tag, elementArr, wire) {
+    /*{6310} : Beneficiary’s FI Advice Information
+        Advice Code (LTR, PHN, TLX or WRE)
+        Additional Information (1 line of 26 characters, plus up to 5 lines of 33 characters each)
+        If present, {4100} and {4200} are required.*/
+    let errTag = "";
+    let beneficiaryFIAdviceCode = wire['beneficiaryFIAdviceCode'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        if(objElement.name === "beneficiaryFIAdviceCode"){
+            if(typeof beneficiaryFIAdviceCode !== 'undefined' && beneficiaryFIAdviceCode!== null && beneficiaryFIAdviceCode!== ""){
+                errTag = errTag + checkMandatory(tag, objElement, beneficiaryFIAdviceCode)+" ";
+            }
+        } else {
+            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        }
+        if(typeof val !== 'undefined' && val!== null && val!== ""){
+            // Check 4100, 4200 exist or not
+            let beneficiaryFICode = wire['beneficiaryFICode'];
+            if(typeof beneficiaryFICode == 'undefined' && beneficiaryFICode == null && beneficiaryFICode == ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is present then {4100} must be present; ";
+            }
+            let beneficiaryCode = wire['beneficiaryCode'];
+            if(typeof beneficiaryCode == 'undefined' && beneficiaryCode == null && beneficiaryCode == ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is present then {4200} must be present; ";
+            }
+        }
+    }
+    return errTag;
+}
+
+function verify6400(tag, elementArr, wire) {
+    /*{6400} Beneficiary Information
+        1 line of 30 characters, plus up to 5 lines of 33 characters each.
+        If present, {4200} is required.*/
+    let errTag = "";
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        if(typeof val !== 'undefined' && val!== null && val!== ""){
+            // Check 4200 exist or not
+            let beneficiaryCode = wire['beneficiaryCode'];
+            if(typeof beneficiaryCode == 'undefined' && beneficiaryCode == null && beneficiaryCode == ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is present then {4200} must be present; ";
+            }
+        }
+    }
+    return errTag;
+}
+
+function verify6410(tag, elementArr, wire) {
+    /*{6410} : Beneficiary Advice Information
+        Advice Code (LTR, PHN, TLX, WRE or HLD)
+        Additional Information (1 line of 26 characters, plus up to 5 lines of 33 characters each)
+        If present, {4200} is required.*/
+    let errTag = "";
+    let beneficiaryAdviceCode = wire['beneficiaryAdviceCode'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        if(objElement.name === "beneficiaryAdviceCode"){
+            if(typeof beneficiaryAdviceCode !== 'undefined' && beneficiaryAdviceCode!== null && beneficiaryAdviceCode!== ""){
+                errTag = errTag + checkMandatory(tag, objElement, beneficiaryAdviceCode)+" ";
+            }
+        } else {
+            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        }
+        if(typeof val !== 'undefined' && val!== null && val!== ""){
+            // Check 4200 exist or not
+            let beneficiaryCode = wire['beneficiaryCode'];
+            if(typeof beneficiaryCode == 'undefined' && beneficiaryCode == null && beneficiaryCode == ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is present then {4200} must be present; ";
+            }
+        }
+    }
+    return errTag;
+}
+
+function verify6420(tag, elementArr, wire) {
+    /*{6420} : Method of Payment to Beneficiary
+        Method of Payment (‘CHECK’ is the only valid option) Additional Information (30 characters)
+        If present, {6410} and {4200} are required.*/
+    let errTag = "";
+    let methodOfPayment = wire['methodOfPayment'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        if(objElement.name === "methodOfPayment"){
+            if(typeof methodOfPayment !== 'undefined' && methodOfPayment!== null && methodOfPayment!== ""){
+                errTag = errTag + checkMandatory(tag, objElement, methodOfPayment)+" ";
+            }
+        } else {
+            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        }
+        if(typeof val !== 'undefined' && val!== null && val!== ""){
+            // Check 4200, 6410 exist or not
+            let beneficiaryCode = wire['beneficiaryCode'];
+            if(typeof beneficiaryCode == 'undefined' && beneficiaryCode == null && beneficiaryCode == ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is present then {4200} must be present; ";
+            }
+            let beneficiaryAdviceCode = wire['beneficiaryAdviceCode'];
+            if(typeof beneficiaryAdviceCode == 'undefined' && beneficiaryAdviceCode == null && beneficiaryAdviceCode == ""){
+                errTag = errTag + tag+ ": If "+objElement.name+" is present then {6410} must be present; ";
+            }
+        }
+    }
+    return errTag;
+}
+
+function verify6500(tag, elementArr, wire) {
+    /*{6500} FI to FI Information
+        up to 6 lines of 35 characters each*/
+    let errTag = "";
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+    }
+    return errTag;
+}
+
+function verify7033(tag, elementArr, wire) {
+    /*{7033} : Sequence B 33B Currency/Instructed Amount
+        SWIFT Field Tag (5 characters) Instructed Amount (18 characters)
+        {3600} must be CTP and {3610} must be COVS; otherwise not permitted.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        if(busFunCode !== "CTP" && localInstrumentCode !== "COVS"){
+            if(typeof val !== 'undefined' && val !== null && val !== ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
+            }
+        }
+        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+    }
+    return errTag;
+}
+
+function verify7050(tag, elementArr, wire) {
+    /*{7050} : Sequence B 50a Ordering Customer
+        SWIFT Field Tag (5 characters) Line 1 to 5 (35 characters each)
+        Must be present if {3600} is CTP and {3610} is COVS; otherwise not permitted.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        if(busFunCode !== "CTP" && localInstrumentCode !== "COVS"){
+            if(typeof val !== 'undefined' && val !== null && val !== ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
+            }
+        }
+        if(busFunCode == "CTP" && localInstrumentCode == "COVS"){
+            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+        } else {
+            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        }
+    }
+    return errTag;
+}
+
+function verify7052(tag, elementArr, wire) {
+    /*{7052} : Sequence B 52a Ordering Institution
+        SWIFT Field Tag (5 characters) Line 1 to 5 (35 characters each)
+        {3600} must be CTP and {3610} must be COVS; otherwise not permitted.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        if(busFunCode !== "CTP" && localInstrumentCode !== "COVS"){
+            if(typeof val !== 'undefined' && val !== null && val !== ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
+            }
+        }
+        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+    }
+    return errTag;
+}
+
+function verify7056(tag, elementArr, wire) {
+    /*{7056} : Sequence B 56a Intermediary Institution
+        SWIFT Field Tag (5 characters) Line 1 to 5 (35 characters each).
+        {3600} must be CTP and {3610} must be COVS; otherwise not permitted.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        if(busFunCode !== "CTP" && localInstrumentCode !== "COVS"){
+            if(typeof val !== 'undefined' && val !== null && val !== ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
+            }
+        }
+        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+    }
+    return errTag;
+}
+
+function verify7057(tag, elementArr, wire) {
+    /*{7057} : Sequence B 57a Account with Institution
+        SWIFT Field Tag (5 characters) Line 1 to 5 (35 characters each).
+        {3600} must be CTP and {3610} must be COVS; otherwise not permitted.
+        Must be present if {7056} is present.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    let seqBIntermediaryInstitutionTag = wire['seqBIntermediaryInstitutionTag'];
+    let seqBIntermediaryInstitutionLine1 = wire['seqBIntermediaryInstitutionLine1'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        if(busFunCode !== "CTP" && localInstrumentCode !== "COVS"){
+            if(typeof val !== 'undefined' && val !== null && val !== ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
+            }
+        }
+        if(typeof seqBIntermediaryInstitutionTag !== 'undefined' && seqBIntermediaryInstitutionTag !== null && seqBIntermediaryInstitutionTag !== ""){
+            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+        }
+        if(typeof seqBIntermediaryInstitutionLine1 !== 'undefined' && seqBIntermediaryInstitutionLine1 !== null && seqBIntermediaryInstitutionLine1 !== ""){
+            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+        }
+        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+    }
+    return errTag;
+}
+
+function verify7059(tag, elementArr, wire) {
+    /*{7059} : Sequence B 59a Beneficiary Customer
+        SWIFT Field Tag (5 characters) Line 1 to 5 (35 characters each)
+        Must be present if {3600} is CTP and {3610} is COVS; otherwise not permitted.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        if(busFunCode !== "CTP" && localInstrumentCode !== "COVS"){
+            if(typeof val !== 'undefined' && val !== null && val !== ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
+            }
+        }
+        if(busFunCode == "CTP" && localInstrumentCode == "COVS"){
+            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+        } else {
+            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        }
+    }
+    return errTag;
+}
+
+function verify7070(tag, elementArr, wire) {
+    /*{7070} : Sequence B 70 Remittance Information
+        SWIFT Field Tag (5 characters) Line 1 to 4 (35 characters each)
+        {3600} must be CTP and {3610} must be COVS; otherwise not permitted.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        if(busFunCode !== "CTP" && localInstrumentCode !== "COVS"){
+            if(typeof val !== 'undefined' && val !== null && val !== ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
+            }
+        }
+        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+    }
+    return errTag;
+}
+
+function verify7072(tag, elementArr, wire) {
+    /*{7072} : Sequence B 72 Sender to Receiver Information
+        SWIFT Field Tag (5 characters) Line 1 to 6 (35 characters each)
+        {3600} must be CTP and {3610} must be COVS; otherwise not permitted.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        if(busFunCode !== "CTP" && localInstrumentCode !== "COVS"){
+            if(typeof val !== 'undefined' && val !== null && val !== ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
+            }
+        }
+        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+    }
+    return errTag;
+}
+
+function verify8200(tag, elementArr, wire) {
+    /*{8200} : Unstructured Addenda Information
+        Addenda Length (4 characters) Addenda Information (8,994 characters)
+        Must be present if {3600} is CTP and {3610} is ANSI, GXML, IXML, NARR, S820, SWIF or UEDI; otherwise not permitted.
+        Addenda Length must be numeric, padded with leading zeros if less than four characters and must equal length of content in Addenda Information (e.g., if content of Addenda Information is 987 characters, Addenda Length must be 0987).
+        If {3610} is ANSI or S820, only the X12 Character Set* is permitted in Addenda Information element.
+        If {3610} is GXML, IXML, NARR, SWIF or UEDI, only the SWIFT MX ISO 20022 Character Set* is permitted in Addenda Information element.
+        * See latest version of the FAIM manual for specific characters included in character set.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        if(busFunCode !== "CTP" && localInstrumentCode !== "ANSI" && localInstrumentCode !== "GXML" && localInstrumentCode !== "IXML" && localInstrumentCode !== "NARR" && localInstrumentCode !== "S820" && localInstrumentCode !== "SWIF" && localInstrumentCode !== "UEDI"){
+            if(typeof val !== 'undefined' && val !== null && val !== ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode is in (ANSI, GXML, IXML, NARR, S820, SWIF or UEDI); ";
+            }
+        }
+        if(busFunCode == "CTP" && (localInstrumentCode == "ANSI" || localInstrumentCode == "GXML" || localInstrumentCode == "IXML" || localInstrumentCode == "NARR" || localInstrumentCode == "S820" || localInstrumentCode == "SWIF" || localInstrumentCode == "UEDI")){
+            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+        } else {
+            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        }
+        if(objElement.name === "unstructuredAddendaLength"){
+            if(!is_Numeric(val)){
+                errTag = errTag + tag+ ": "+objElement.name+" must be numeric; ";
+            }
+        }
+    }
+    return errTag;
+}
+
+function is_Numeric(num) {
+    return !isNaN(parseFloat(num)) && isFinite(num);
+}
+
+function verify8250(tag, elementArr, wire) {
+    /*{8250} : Related Remittance Information
+        Remittance Identification (35 characters) Remittance Location Method (4 character code)
+        EDIC EMAL FAXI POST SMSM URID
+        Electronic Data Interchange E-mail
+        Fax
+        Postal services
+        Short Message Service (text) Uniform Resource Identifier
+        Remittance Location Electronic Address (2,048 characters; i.e., E-mail or URL address)
+        Name (140 characters)
+        Address Type (ADDR, BIZZ, DLVY, HOME, MLTO, PBOX) Department (70 characters)
+        Sub-Department (70 characters)
+        Street Name (70 characters)
+        Building Number (16 characters)
+        Post Code (16 characters)
+        Town Name (35 characters)
+        Country Sub Division/State (35 characters)
+        Country (2 characters)
+        Address Line 1 to 7 (70 characters each)
+        Must be present if {3600} is CTP and {3610} is RRMT; otherwise not permitted.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        if(busFunCode !== "CTP" && localInstrumentCode !== "RRMT"){
+            if(typeof val !== 'undefined' && val !== null && val !== ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = RRMT; ";
+            }
+        }
+        if(busFunCode == "CTP" && localInstrumentCode == "RRMT"){
+            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+        } else {
+            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        }
+    }
+    return errTag;
+}
+
+function verify8300(tag, elementArr, wire) {
+    /*{8300} : Remittance Originator
+        Identification Type (‘OI’ organization ID or ‘PI’ private ID) Identification Code (4 character code):
+        Organization Identification Codes (BANK, CUST, DUNS, EMPL, GS1G, PROP, SWBB, TXID )
+        Private Identification Codes (ARNU, CCPT, CUST, DPOB, DRLC, EMPL, NIDN, PROP, SOSE, TXID)
+        Name (140 characters)
+        Identification Number (35 characters)
+        Identification Number Issuer (35 characters)
+        Date & Place of Birth (82 characters)
+        Address Type (ADDR, BIZZ, DLVY, HOME, MLTO, PBOX) Department (70 characters)
+        Sub-Department (70 characters)
+        Street Name (70 characters)
+        Building Number (16 characters)
+        Post Code (16 characters)
+        Town Name (35 characters)
+        Country Sub Division/State (35 characters)
+        Country (2 characters)
+        Address Line 1 to 7 (70 characters each)
+        Country of Residence (2 characters)
+        Contact Name (140 characters)
+        Contact Phone Number (35 characters)
+        Contact Mobile Number (35 characters)
+        Contact Fax Number (35 characters)
+        Contact Electronic Address (2,048 characters; i.e., E-mail or URL address)
+        Contact Other Information (35 characters)
+        Must be present if {3600} is CTP and {3610} is RMTS; otherwise not permitted.
+        Identification Type, Identification Code and Name are mandatory.
+        Identification Number is mandatory for all Identification Codes except DPOB.
+        Identification Number is not permitted for Identification Code DPOB.
+        Identification Number Issuer is not permitted for Identification Code SWBB and DPOB.
+        Date & Place of Birth is only permitted for Identification Code DPOB.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    let remittanceOrignatorIDCode = wire['remittanceOrignatorIDCode'];
+    let remittanceOrignatorIDNumber = wire['remittanceOrignatorIDNumber'];
+    let remittanceOrignatorIDIssuer = wire['remittanceOrignatorIDIssuer'];
+    let remittanceOrignatorDatePlaceBirth = wire['remittanceOrignatorDatePlaceBirth'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        if(busFunCode !== "CTP" && localInstrumentCode !== "RMTS"){
+            if(typeof val !== 'undefined' && val !== null && val !== ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = RMTS; ";
+            }
+        }
+        if(busFunCode == "CTP" && localInstrumentCode == "RMTS"){
+            if(objElement.name == "remittanceOrignatorIDType" || objElement.name == "remittanceOrignatorIDCode" || objElement.name == "remittanceOrignatorName"){
+                errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            } else if(objElement.name == "remittanceOrignatorIDNumber"){
+                if(remittanceOrignatorIDCode !== "DPOB"){
+                    errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+                } else {
+                    errTag = errTag + checkOptional(tag, objElement, val)+" ";
+                }
+                if(typeof remittanceOrignatorIDNumber !== 'undefined' && remittanceOrignatorIDNumber !== null && remittanceOrignatorIDNumber !== "" && remittanceOrignatorIDCode == "DPOB"){
+                    errTag = errTag + tag+ ": "+objElement.name+" is not permitted for Identification Code DPOB; ";
+                }
+            } else if(objElement.name == "remittanceOrignatorIDIssuer"){
+                if(typeof remittanceOrignatorIDIssuer !== 'undefined' && remittanceOrignatorIDIssuer !== null && remittanceOrignatorIDIssuer !== "" && (remittanceOrignatorIDCode == "DPOB" || remittanceOrignatorIDCode == "SWBB")){
+                    errTag = errTag + tag+ ": "+objElement.name+" is not permitted for Identification Code DPOB & SWBB; ";
+                } else {
+                    errTag = errTag + checkOptional(tag, objElement, val)+" ";
+                }
+            } else if(objElement.name == "remittanceOrignatorDatePlaceBirth"){
+                if(typeof remittanceOrignatorDatePlaceBirth !== 'undefined' && remittanceOrignatorDatePlaceBirth !== null && remittanceOrignatorDatePlaceBirth !== "" && remittanceOrignatorIDCode !== "DPOB"){
+                    errTag = errTag + tag+ ": "+objElement.name+" is only permitted for Identification Code DPOB; ";
+                } else {
+                    errTag = errTag + checkOptional(tag, objElement, val)+" ";
+                }
+            } else {  
+                errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            }            
+        } else {
+            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        }
+    }
+    return errTag;
+}
+
+function verify8350(tag, elementArr, wire) {
+    /*{8350} : Remittance Beneficiary
+        Name (140 characters)
+        Identification Type (‘OI’ organization ID or ‘PI’ private ID) Identification Code (4 character code):
+        Organization Identification Codes (BANK, CUST, DUNS, EMPL, GS1G, PROP, SWBB, TXID)
+        Private Identification Codes (ARNU, CCPT, CUST, DPOB, DRLC, EMPL, NIDN, PROP, SOSE, TXID)
+        Identification Number (35 characters)
+        Identification Number Issuer (35 characters)
+        Date & Place of Birth (82 characters)
+        Address Type (ADDR, BIZZ, DLVY, HOME, MLTO, PBOX) Department (70 characters)
+        Sub-Department (70 characters) Street Name (70 characters) Building Number (16 characters) Post Code (16 characters)
+        Town Name (35 characters)
+        Country Sub Division/State (35 characters) Country (2 characters)
+        Address Line 1 to 7 (70 characters each) Country of Residence (2 characters),
+        Must be present if {3600} is CTP and {3610} is RMTS; otherwise not permitted.
+        Name is mandatory. Identification Number
+         Not permitted unless Identification Type and Identification Code are present.
+         Not permitted for Identification Code DPOB.
+        Identification Number Issuer
+         Not permitted unless Identification Type, Identification Code and Identification Number are present.
+         Not permitted for Identification Code SWBB and DPOB.
+        Date & Place of Birth is only permitted for Identification Code DPOB.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    let remittanceBeneficiaryName = wire['remittanceBeneficiaryName'];
+    let remittanceBeneficiaryIDCode = wire['remittanceBeneficiaryIDCode'];
+    let remittanceBeneficiaryDatePlaceBirth = wire['remittanceBeneficiaryDatePlaceBirth'];
+    let remittanceBeneficiaryIDNumber = wire['remittanceBeneficiaryIDNumber'];
+    let remittanceBeneficiaryIDType = wire['remittanceBeneficiaryIDType'];
+    let remittanceBeneficiaryIDIssuer = wire['remittanceBeneficiaryIDIssuer'];
+
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        if(busFunCode !== "CTP" && localInstrumentCode !== "RMTS"){
+            if(typeof val !== 'undefined' && val !== null && val !== ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = RMTS; ";
+            }
+        }
+        if(busFunCode == "CTP" && localInstrumentCode == "RMTS"){
+            if(objElement.name == "remittanceBeneficiaryName"){
+                errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            } else if(objElement.name == "remittanceBeneficiaryIDNumber"){
+                if(typeof remittanceBeneficiaryIDNumber !== 'undefined' && remittanceBeneficiaryIDNumber !== null && remittanceBeneficiaryIDNumber !== ""){
+                    if(remittanceBeneficiaryIDType=="" || remittanceBeneficiaryIDType==null || remittanceBeneficiaryIDCode=="" || remittanceBeneficiaryIDCode==null){
+                        errTag = errTag + tag+ ": "+objElement.name+" is not permitted unless Identification Type and Identification Code are present; ";
+                    }
+                }
+                if(typeof remittanceBeneficiaryIDNumber !== 'undefined' && remittanceBeneficiaryIDNumber !== null && remittanceBeneficiaryIDNumber !== "" && remittanceBeneficiaryIDCode == "DPOB"){
+                    errTag = errTag + tag+ ": "+objElement.name+" is not permitted for Identification Code DPOB; ";
+                }
+            }  else if(objElement.name == "remittanceBeneficiaryIDIssuer"){
+                if(typeof remittanceBeneficiaryIDIssuer !== 'undefined' && remittanceBeneficiaryIDIssuer !== null && remittanceBeneficiaryIDIssuer !== ""){
+                    if(remittanceBeneficiaryIDType=="" || remittanceBeneficiaryIDType==null || remittanceBeneficiaryIDCode=="" || remittanceBeneficiaryIDCode==null || remittanceBeneficiaryIDNumber=="" || remittanceBeneficiaryIDNumber==null){
+                        errTag = errTag + tag+ ": "+objElement.name+" is Not permitted unless Identification Type, Identification Code and Identification Number are present; ";
+                    }
+                }
+                if(typeof remittanceBeneficiaryIDIssuer !== 'undefined' && remittanceBeneficiaryIDIssuer !== null && remittanceBeneficiaryIDIssuer !== "" && (remittanceBeneficiaryIDCode == "DPOB" || remittanceBeneficiaryIDCode == "SWBB")){
+                    errTag = errTag + tag+ ": "+objElement.name+" is not permitted for Identification Code SWBB and DPOB; ";
+                }
+            } else if(objElement.name == "remittanceBeneficiaryDatePlaceBirth"){
+                if(typeof remittanceBeneficiaryDatePlaceBirth !== 'undefined' && remittanceBeneficiaryDatePlaceBirth !== null && remittanceBeneficiaryDatePlaceBirth !== "" && remittanceBeneficiaryIDCode !== "DPOB"){
+                    errTag = errTag + tag+ ": "+objElement.name+" is only permitted for Identification Code DPOB; ";
+                } else {
+                    errTag = errTag + checkOptional(tag, objElement, val)+" ";
+                }
+            } else {  
+                errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            }            
+        } else {
+            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        }
+    }
+    return errTag;
+}
+
+function verify9000(tag, elementArr, wire) {
+    /*{9000} : Service Message Information
+        Line 1 to 12 (35 characters each)
+        {3600} must be SVC.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        if(busFunCode !== "SVC"){
+            if(typeof val !== 'undefined' && val !== null && val !== ""){
+                errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = SVC; ";
+            }
+        }
+        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+    }
+    return errTag;
+}
+
+function verify1100(tag, elementArr, wire) {
+    /*{1100} : Message Disposition
+        Format Version ‘30’
+        Test Production Code (‘T’ test or ‘P’ production)
+        Message Duplication Code (‘ ‘ original, ‘R’ retrieval of an original message or ‘P’ possible duplicate) Message Status Indicator (1 character code)
+        Outgoing Messages
+        0 In Process or Intercepted
+        2 Successful with Accounting (Value)
+        3 Rejected due to Error Condition
+        7 Successful without Accounting (Non-Value)
+        Incoming Messages
+        N Successful with Accounting (Value)
+        S Successful without Accounting (Non-Value)*/
+    let errTag = "";
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+    }
+    return errTag;
+}
+
+function verify1110(tag, elementArr, wire) {
+    /*{1110} : Receipt Time Stamp
+        Receipt Date (MMDD, based on the calendar date)
+        Receipt Time (HHMM, based on a 24-hour clock, Eastern Time) Receipt Application ID (4 characters)*/
+    let errTag = "";
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+    }
+    return errTag;
+}
+
+function verify1120(tag, elementArr, wire) {
+    /*{1120} : Output Message Accountability Data (OMAD)
+        Output Cycle Date (CCYYMMDD)
+        Output Destination ID (8 characters)
+        Output Sequence Number (6 characters)
+        Output Date (MMDD, based on the calendar date)
+        Output Time (HHMM, based on a 24-hour clock, Eastern Time) Output FRB Application ID (4 characters)*/
+    let errTag = "";
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+    }
+    return errTag;
+}
+
+function verify1130(tag, elementArr, wire) {
+    /*{1130} : Error
+        Error Category (1 character code) E Data Error
+        F Insufficient Balance X Duplicate IMAD
+        Error Code (3 characters)
+        Error Description (35 characters)
+        H Accountability Error W Cutoff Hour Error
+        I In Process or Intercepted*/
+    let errTag = "";
+    for(var j = 0; j < elementArr.length; j++) {
+        let objElement = elementArr[j];
+        let val = wire[objElement.name];
+        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+    }
+    return errTag;
+}
+
 function verifytag(tag, elementArr, wire){
     //console.log("tag =" + tag);
     let errTag = "";
@@ -699,14 +1695,113 @@ function verifytag(tag, elementArr, wire){
         case 4400:
             errTag = verify4400(tag, elementArr, wire);
             break;
+        case 5000:
+            errTag = verify5000(tag, elementArr, wire);
+            break;
+        case 5010:
+            errTag = verify5010(tag, elementArr, wire);
+            break;
+        case 5100:
+            errTag = verify5100(tag, elementArr, wire);
+            break;
+        case 5200:
+            errTag = verify5200(tag, elementArr, wire);
+            break;
+        case 5400:
+            errTag = verify5400(tag, elementArr, wire);
+            break;
+        case 6000:
+            errTag = verify6000(tag, elementArr, wire);
+            break;
+        case 6100:
+            errTag = verify6100(tag, elementArr, wire);
+            break;
+        case 6110:
+            errTag = verify6110(tag, elementArr, wire);
+            break;
+        case 6200:
+            errTag = verify6200(tag, elementArr, wire);
+            break;
+        case 6210:
+            errTag = verify6210(tag, elementArr, wire);
+            break;
+        case 6300:
+            errTag = verify6300(tag, elementArr, wire);
+            break;
+        case 6310:
+            errTag = verify6310(tag, elementArr, wire);
+            break;
+        case 6400:
+            errTag = verify6400(tag, elementArr, wire);
+            break;
+        case 6410:
+            errTag = verify6410(tag, elementArr, wire);
+            break;
+        case 6420:
+            errTag = verify6420(tag, elementArr, wire);
+            break;
+        case 6500:
+            errTag = verify6500(tag, elementArr, wire);
+            break;
+        case 7033:
+            errTag = verify7033(tag, elementArr, wire);
+            break;
+        case 7050:
+            errTag = verify7050(tag, elementArr, wire);
+            break;
+        case 7052:
+            errTag = verify7052(tag, elementArr, wire);
+            break;
+        case 7056:
+            errTag = verify7056(tag, elementArr, wire);
+            break;
+        case 7057:
+            errTag = verify7057(tag, elementArr, wire);
+            break;
+        case 7059:
+            errTag = verify7059(tag, elementArr, wire);
+            break;
+        case 7070:
+            errTag = verify7070(tag, elementArr, wire);
+            break;
+        case 7072:
+            errTag = verify7072(tag, elementArr, wire);
+            break;
+        case 8200:
+            errTag = verify8200(tag, elementArr, wire);
+            break;
+        case 8250:
+            errTag = verify8250(tag, elementArr, wire);
+            break;
+        case 8300:
+            errTag = verify8300(tag, elementArr, wire);
+            break;
+        case 8350:
+            errTag = verify8350(tag, elementArr, wire);
+            break;
+        case 9000:
+            errTag = verify9000(tag, elementArr, wire);
+            break;
+        case 1100:
+            errTag = verify1100(tag, elementArr, wire);
+            break;
+        case 1110:
+            errTag = verify1110(tag, elementArr, wire);
+            break;
+        case 1120:
+            errTag = verify1120(tag, elementArr, wire);
+            break;
+        case 1130:
+            errTag = verify1130(tag, elementArr, wire);
+            break;
         default:
             errTag = tag + ":" + "verify tbd";
             break;
     }
     return errTag;
 }
-console.log("Total Tag Count:" + tagCnt);
-console.log("\n");
+//console.log("Total Tag Count:" + tagCnt);
+//console.log("\n");
 console.log("Error:" + errorMsg);
 console.log("\n");
 
@@ -739,6 +1834,13 @@ function checkOptional(tag, objElement, val){
     if(typeof val !== 'undefined'){
         if(val !== null && val.length > objElement.length){
             err = tag+":"+objElement.name+": value too long;";
+        }
+        if(val !== null && objElement.value !== ""){
+            var n = objElement.value.includes(val);
+            //console.log("checkMandatory exist : " + n);
+            if(n === false){
+                err = tag+":"+objElement.name+": value " + val + " not in " + objElement.value.toString()+";";
+            }
         }
     }
     return err;
