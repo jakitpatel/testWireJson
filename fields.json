@@ -2818,7 +2818,7 @@
    "elements":[
       {
          "ordinal":1,
-         "length":30,
+         "length":2,
          "name":"messageDispositionFormatVer",
          "delimiter":"",
          "mandatory":0,
