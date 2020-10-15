@@ -484,7 +484,7 @@
    "elements":[
       {
          "ordinal":1,
-         "length":12,
+         "length":1,
          "name":"beneficiaryFICode",
          "delimiter":"",
          "mandatory":2,
@@ -543,7 +543,7 @@
    "elements":[
       {
          "ordinal":1,
-         "length":12,
+         "length":1,
          "name":"beneficiaryCode",
          "delimiter":"",
          "mandatory":2,
@@ -675,7 +675,7 @@
    "elements":[
       {
          "ordinal":1,
-         "length":12,
+         "length":1,
          "name":"originatorCode",
          "delimiter":"",
          "mandatory":2,
