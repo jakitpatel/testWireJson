@@ -38,10 +38,18 @@ Object.entries(inputObj).forEach(
                 let len = el.length;
                 let fieldVal = '';
                 //console.log("value : "+value);
+                //console.log("charCnt : "+charCnt);
                 let nextChar = value.substr(charCnt, 1);
+                //console.log("nextChar : "+nextChar);
+                //Check for additional start at the end of value
+                if(nextChar==="*"){
+                    charCnt = charCnt + 1;
+                }
+                nextChar = value.substr(charCnt, 1);
                 if(nextChar != " "){ // Skip the field if value is blank
                     //Get the Value by length of an element
                     fieldVal = value.substr(charCnt, len);
+                    //console.log(fieldVal);
                     if(fieldVal.includes("*")){
                         let index = fieldVal.indexOf("*");
                         fieldVal = fieldVal.substr(0,index);
