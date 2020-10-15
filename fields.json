@@ -425,7 +425,7 @@
    "elements":[
       {
          "ordinal":1,
-         "length":12,
+         "length":1,
          "name":"intermediaryFICode",
          "delimiter":"",
          "mandatory":2,
@@ -616,7 +616,7 @@
    "elements":[
       {
          "ordinal":1,
-         "length":12,
+         "length":1,
          "name":"accountDebitedCode",
          "delimiter":"",
          "mandatory":2,
@@ -820,7 +820,7 @@
    "elements":[
       {
          "ordinal":1,
-         "length":12,
+         "length":1,
          "name":"originatorFICode",
          "delimiter":"",
          "mandatory":2,
@@ -879,7 +879,7 @@
    "elements":[
       {
          "ordinal":1,
-         "length":12,
+         "length":1,
          "name":"instructingFICode",
          "delimiter":"",
          "mandatory":2,
