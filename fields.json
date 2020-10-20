@@ -401,7 +401,7 @@
          "name":"instructedAmount",
          "delimiter":"",
          "mandatory":2,
-         "value":"[0-9][0-9,]*",
+         "value":"",
          "desc":"only allowed if 3600.businessFunctionCode in (CTP, CTR) AND 3610.localInstrumentCode != COVS; mandatory if 3720.exchangeRate is present"
       }
    ]
