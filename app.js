@@ -26,19 +26,19 @@ for(var i = 0; i < fields.length; i++) {
         if(objElement.mandatory == 0){
             let err1 = checkOptional(obj.tag, objElement, val);
             if(err1 !== null){
-                errorMsg = errorMsg+err1+" ";
+                errorMsg = errorMsg+err1;
             }
         }
         else if(objElement.mandatory == 1){
             let err1 = checkMandatory(obj.tag, objElement, val);
             if(err1 !== null){
-                errorMsg = errorMsg+err1+" ";
+                errorMsg = errorMsg+err1;
             }
         }
         else if(objElement.mandatory == 2){
             let err1 = checkSpecial(obj.tag, objElement, val, wire);
             if(err1 !== null){
-                errorMsg = errorMsg+err1+" ";
+                errorMsg = errorMsg+err1;
             }
         }
         else {
@@ -60,7 +60,7 @@ function verify1500(tag, elementArr, wire) {
     for(var j = 0; j < elementArr.length; j++) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
-        errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+        errTag = errTag + checkMandatory(tag, objElement, val);
     }
     return errTag;
 }
@@ -74,7 +74,7 @@ function verify1510(tag, elementArr, wire) {
     for(var j = 0; j < elementArr.length; j++) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
-        errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+        errTag = errTag + checkMandatory(tag, objElement, val);
     }
     return errTag;
 }
@@ -112,7 +112,7 @@ function verify2000(tag, elementArr, wire) {
     let errTag = "";
     let amount = wire['amount'];
 
-    errTag = errTag + checkMandatory(tag, elementArr[0], amount)+" ";
+    errTag = errTag + checkMandatory(tag, elementArr[0], amount);
     let subtypeCode = wire['subtypeCode'];
     if(subtypeCode=="90"){
         if(amount!=="000000000000"){
@@ -131,7 +131,7 @@ function verify3100(tag, elementArr, wire) {
     for(var j = 0; j < elementArr.length; j++) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
-        errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+        errTag = errTag + checkMandatory(tag, objElement, val);
     }
     return errTag;
 }
@@ -145,7 +145,7 @@ function verify3400(tag, elementArr, wire) {
     for(var j = 0; j < elementArr.length; j++) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
-        errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+        errTag = errTag + checkMandatory(tag, objElement, val);
     }
     return errTag;
 }
@@ -160,10 +160,10 @@ function verify3600(tag, elementArr, wire) {
     let errTag = "";
 
     let businessFunctionCode = wire['businessFunctionCode'];
-    errTag = errTag + checkMandatory(tag, elementArr[0], businessFunctionCode)+" ";
+    errTag = errTag + checkMandatory(tag, elementArr[0], businessFunctionCode);
 
     let transactionTypeCode = wire['transactionTypeCode'];
-    errTag = errTag + checkOptional(tag, elementArr[1], transactionTypeCode)+" ";
+    errTag = errTag + checkOptional(tag, elementArr[1], transactionTypeCode);
     
     if(businessFunctionCode == "CTR" && transactionTypeCode=="COV"){
         errTag = errTag + tag+ ": businessFunctionCode = CTR then can have a transactionTypeCode, but COV in transactionTypeCode is not permitted; ";
@@ -176,7 +176,7 @@ function verify3320(tag, elementArr, wire) {
     let errTag = "";
 
     let senderReference = wire['senderReference'];
-    errTag = errTag + checkOptional(tag, elementArr[0], senderReference)+" ";
+    errTag = errTag + checkOptional(tag, elementArr[0], senderReference);
     
     return errTag;
 }
@@ -187,12 +187,12 @@ function verify3500(tag, elementArr, wire) {
     let errTag = "";
 
     let prevMsgID = wire['prevMsgID'];
-    errTag = errTag + checkOptional(tag, elementArr[0], prevMsgID)+" ";
+    errTag = errTag + checkOptional(tag, elementArr[0], prevMsgID);
     
     let typeSubTypeCode = wire['typeCode']+wire['subtypeCode'];
     let busFunCode = wire['businessFunctionCode'];
     if((typeSubTypeCode == "XX02" || typeSubTypeCode == "XX08") && (busFunCode =="BTR" || busFunCode =="CTR" || busFunCode =="CTP")){
-        errTag = errTag + checkMandatory(tag, elementArr[0], prevMsgID)+" ";
+        errTag = errTag + checkMandatory(tag, elementArr[0], prevMsgID);
     }
     return errTag;
 }
@@ -213,7 +213,7 @@ function verify3610(tag, elementArr, wire) {
             errTag = errTag + tag+ ": localInstrumentCode : only allowed if 3600.businessFunctionCode = CTP; ";
         } else {
             // check Val from values & length
-            errTag = errTag + checkMandatory(tag, elementArr[0], localInstrumentCode)+" ";
+            errTag = errTag + checkMandatory(tag, elementArr[0], localInstrumentCode);
         }
     }
 
@@ -223,7 +223,7 @@ function verify3610(tag, elementArr, wire) {
             errTag = errTag + tag+ " : proprietaryCode : only allowed if 3610.localInstrumentCode = PROP; ";
         } else {
             // check length
-            errTag = errTag + checkMandatory(tag, elementArr[1], proprietaryCode)+" ";
+            errTag = errTag + checkMandatory(tag, elementArr[1], proprietaryCode);
         }
     }
     return errTag;
@@ -263,7 +263,7 @@ function verify3620(tag, elementArr, wire) {
                 }
             }
         } else {
-            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            errTag = errTag + checkOptional(tag, objElement, val);
         }
     }
     return errTag;
@@ -289,13 +289,13 @@ function verify3700(tag, elementArr, wire) {
             errTag = errTag + tag+ ": detailsOfCharges : only allowed if 3610.localInstrumentCode not COVS; ";
         } else {
             // check Val from values & length
-            errTag = errTag + checkMandatory(tag, elementArr[0], detailsOfCharges)+" ";
+            errTag = errTag + checkMandatory(tag, elementArr[0], detailsOfCharges);
         }
     }
 
     let letters = /^[A-Za-z]+$/;
     let sendersChargesCurrency1 = wire['sendersChargesCurrency1'];
-    errTag = errTag + checkOptional(tag, elementArr[1], sendersChargesCurrency1)+" ";
+    errTag = errTag + checkOptional(tag, elementArr[1], sendersChargesCurrency1);
     if(typeof sendersChargesCurrency1 !== 'undefined' && sendersChargesCurrency1!== null && sendersChargesCurrency1!== ""){
         if(!sendersChargesCurrency1.match(letters)) {
             errTag = errTag + tag+ ": sendersChargesCurrency1 : only allowed [A-Z] in 3700.sendersChargesCurrency1; ";
@@ -304,7 +304,7 @@ function verify3700(tag, elementArr, wire) {
 
     let numeric = /^[0-9][0-9,]*$/;
     let sendersChargesAmount1 = wire['sendersChargesAmount1'];
-    errTag = errTag + checkOptional(tag, elementArr[2], sendersChargesAmount1)+" ";
+    errTag = errTag + checkOptional(tag, elementArr[2], sendersChargesAmount1);
     if(typeof sendersChargesAmount1 !== 'undefined' && sendersChargesAmount1!== null && sendersChargesAmount1!== ""){
         if(!sendersChargesAmount1.match(numeric)) {
             errTag = errTag + tag+ ": sendersChargesAmount1 : only allowed [0-9][0-9,]* in 3700.sendersChargesAmount1; ";
@@ -312,7 +312,7 @@ function verify3700(tag, elementArr, wire) {
     }
 
     let sendersChargesCurrency2 = wire['sendersChargesCurrency2'];
-    errTag = errTag + checkOptional(tag, elementArr[3], sendersChargesCurrency2)+" ";
+    errTag = errTag + checkOptional(tag, elementArr[3], sendersChargesCurrency2);
     if(typeof sendersChargesCurrency2 !== 'undefined' && sendersChargesCurrency2!== null && sendersChargesCurrency2!== ""){
         if(!sendersChargesCurrency2.match(letters)) {
             errTag = errTag + tag+ ": sendersChargesCurrency2 : only allowed [A-Z] in 3700.sendersChargesCurrency2; ";
@@ -320,7 +320,7 @@ function verify3700(tag, elementArr, wire) {
     }
 
     let sendersChargesAmount2 = wire['sendersChargesAmount2'];
-    errTag = errTag + checkOptional(tag, elementArr[4], sendersChargesAmount2)+" ";
+    errTag = errTag + checkOptional(tag, elementArr[4], sendersChargesAmount2);
     if(typeof sendersChargesAmount2 !== 'undefined' && sendersChargesAmount2!== null && sendersChargesAmount2!== ""){
         if(!sendersChargesAmount2.match(numeric)) {
             errTag = errTag + tag+ ": sendersChargesAmount2 : only allowed [0-9][0-9,]* in 3700.sendersChargesAmount2; ";
@@ -328,7 +328,7 @@ function verify3700(tag, elementArr, wire) {
     }
 
     let sendersChargesCurrency3 = wire['sendersChargesCurrency3'];
-    errTag = errTag + checkOptional(tag, elementArr[5], sendersChargesCurrency3)+" ";
+    errTag = errTag + checkOptional(tag, elementArr[5], sendersChargesCurrency3);
     if(typeof sendersChargesCurrency3 !== 'undefined' && sendersChargesCurrency3!== null && sendersChargesCurrency3!== ""){
         if(!sendersChargesCurrency3.match(letters)) {
             errTag = errTag + tag+ ": sendersChargesCurrency3 : only allowed [A-Z] in 3700.sendersChargesCurrency3; ";
@@ -336,7 +336,7 @@ function verify3700(tag, elementArr, wire) {
     }
 
     let sendersChargesAmount3 = wire['sendersChargesAmount3'];
-    errTag = errTag + checkOptional(tag, elementArr[6], sendersChargesAmount3)+" ";
+    errTag = errTag + checkOptional(tag, elementArr[6], sendersChargesAmount3);
     if(typeof sendersChargesAmount3 !== 'undefined' && sendersChargesAmount3!== null && sendersChargesAmount3!== ""){
         if(!sendersChargesAmount3.match(numeric)) {
             errTag = errTag + tag+ ": sendersChargesAmount3 : only allowed [0-9][0-9,]* in 3700.sendersChargesAmount3; ";
@@ -344,7 +344,7 @@ function verify3700(tag, elementArr, wire) {
     }
 
     let sendersChargesCurrency4 = wire['sendersChargesCurrency4'];
-    errTag = errTag + checkOptional(tag, elementArr[7], sendersChargesCurrency4)+" ";
+    errTag = errTag + checkOptional(tag, elementArr[7], sendersChargesCurrency4);
     if(typeof sendersChargesCurrency4 !== 'undefined' && sendersChargesCurrency4!== null && sendersChargesCurrency4!== ""){
         if(!sendersChargesCurrency4.match(letters)) {
             errTag = errTag + tag+ ": sendersChargesCurrency4 : only allowed [A-Z] in 3700.sendersChargesCurrency4; ";
@@ -352,7 +352,7 @@ function verify3700(tag, elementArr, wire) {
     }
 
     let sendersChargesAmount4 = wire['sendersChargesAmount4'];
-    errTag = errTag + checkOptional(tag, elementArr[8], sendersChargesAmount4)+" ";
+    errTag = errTag + checkOptional(tag, elementArr[8], sendersChargesAmount4);
     if(typeof sendersChargesAmount4 !== 'undefined' && sendersChargesAmount4!== null && sendersChargesAmount4!== ""){
         if(!sendersChargesAmount4.match(numeric)) {
             errTag = errTag + tag+ ": sendersChargesAmount4 : only allowed [0-9][0-9,]* in 3700.sendersChargesAmount4; ";
@@ -384,18 +384,18 @@ function verify3710(tag, elementArr, wire) {
             errTag = errTag + tag+ ": instructedAmountCurrencyCode : only allowed if 3610.localInstrumentCode not COVS; ";
         } else {
             // check Val from values & length
-            errTag = errTag + checkMandatory(tag, elementArr[0], instAmtCurrCode)+" ";
+            errTag = errTag + checkMandatory(tag, elementArr[0], instAmtCurrCode);
         }
     }
 
     let exchangeRate = wire['exchangeRate'];
     if(exchangeRate!==null && exchangeRate!==""){
-        errTag = errTag + checkMandatory(tag, elementArr[0], instAmtCurrCode)+" ";
-        errTag = errTag + checkMandatory(tag, elementArr[1], instructedAmount)+" ";
+        errTag = errTag + checkMandatory(tag, elementArr[0], instAmtCurrCode);
+        errTag = errTag + checkMandatory(tag, elementArr[1], instructedAmount);
     }
 
     let letters = /^[A-Za-z]+$/;
-    errTag = errTag + checkOptional(tag, elementArr[0], instAmtCurrCode)+" ";
+    errTag = errTag + checkOptional(tag, elementArr[0], instAmtCurrCode);
     if(typeof instAmtCurrCode !== 'undefined' && instAmtCurrCode!== null && instAmtCurrCode!== ""){
         if(!instAmtCurrCode.match(letters)) {
             errTag = errTag + tag+ ": instructedAmountCurrencyCode : only allowed [A-Z] in 3710.sendersChargesCurrency1; ";
@@ -403,7 +403,7 @@ function verify3710(tag, elementArr, wire) {
     }
 
     let numeric = /^[0-9][0-9,]*$/;
-    errTag = errTag + checkOptional(tag, elementArr[1], instructedAmount)+" ";
+    errTag = errTag + checkOptional(tag, elementArr[1], instructedAmount);
     if(typeof instructedAmount !== 'undefined' && instructedAmount!== null && instructedAmount!== ""){
         if(!instructedAmount.match(numeric)) {
             errTag = errTag + tag+ ": instructedAmount : only allowed [0-9][0-9,]* in 3710.instructedAmount; ";
@@ -431,12 +431,12 @@ function verify3720(tag, elementArr, wire) {
             errTag = errTag + tag+ ": exchangeRate : only allowed if 3610.localInstrumentCode not COVS; ";
         } else {
             // check Val from values & length
-            errTag = errTag + checkMandatory(tag, elementArr[0], exchangeRate)+" ";
+            errTag = errTag + checkMandatory(tag, elementArr[0], exchangeRate);
         }
     }
 
     let numeric = /^[0-9][0-9,]*$/;
-    errTag = errTag + checkOptional(tag, elementArr[0], exchangeRate)+" ";
+    errTag = errTag + checkOptional(tag, elementArr[0], exchangeRate);
     if(typeof exchangeRate !== 'undefined' && exchangeRate!== null && exchangeRate!== ""){
         if(!exchangeRate.match(numeric)) {
             errTag = errTag + tag+ ": exchangeRate : only allowed [0-9][0-9,]* in 3720.exchangeRate; ";
@@ -462,16 +462,16 @@ function verify4000(tag, elementArr, wire) {
         let intermediaryFIIdentifier = wire['intermediaryFIIdentifier'];
         if(objElement.name === "intermediaryFICode"){
             if(typeof intermediaryFICode !== 'undefined' && intermediaryFICode!== null && intermediaryFICode!== ""){
-                errTag = errTag + checkMandatory(tag, elementArr[1], intermediaryFIIdentifier)+" ";
-                errTag = errTag + checkMandatory(tag, elementArr[0], intermediaryFICode)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[1], intermediaryFIIdentifier);
+                errTag = errTag + checkMandatory(tag, elementArr[0], intermediaryFICode);
             }
         } else if(objElement.name === "intermediaryFIIdentifier"){
             if(typeof intermediaryFIIdentifier !== 'undefined' && intermediaryFIIdentifier!== null && intermediaryFIIdentifier!== ""){
-                errTag = errTag + checkMandatory(tag, elementArr[0], intermediaryFICode)+" ";
-                errTag = errTag + checkMandatory(tag, elementArr[1], intermediaryFIIdentifier)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[0], intermediaryFICode);
+                errTag = errTag + checkMandatory(tag, elementArr[1], intermediaryFIIdentifier);
             }
         } else {
-            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            errTag = errTag + checkOptional(tag, objElement, val);
         }
     }
     return errTag;
@@ -495,19 +495,19 @@ function verify4100(tag, elementArr, wire) {
         let beneficiaryFIIdentifier = wire['beneficiaryFIIdentifier'];
         if(objElement.name === "beneficiaryFICode"){
             if(typeof beneficiaryFICode !== 'undefined' && beneficiaryFICode!== null && beneficiaryFICode!== ""){
-                errTag = errTag + checkMandatory(tag, elementArr[1], beneficiaryFIIdentifier)+" ";
-                errTag = errTag + checkMandatory(tag, elementArr[0], beneficiaryFICode)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[1], beneficiaryFIIdentifier);
+                errTag = errTag + checkMandatory(tag, elementArr[0], beneficiaryFICode);
             }
         } else if(objElement.name === "beneficiaryFIIdentifier"){
             if(typeof beneficiaryFIIdentifier !== 'undefined' && beneficiaryFIIdentifier!== null && beneficiaryFIIdentifier!== ""){
-                errTag = errTag + checkMandatory(tag, elementArr[0], beneficiaryFICode)+" ";
-                errTag = errTag + checkMandatory(tag, elementArr[1], beneficiaryFIIdentifier)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[0], beneficiaryFICode);
+                errTag = errTag + checkMandatory(tag, elementArr[1], beneficiaryFIIdentifier);
             }
         } else {
-            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            errTag = errTag + checkOptional(tag, objElement, val);
         }
         if(typeof intermediaryFICode !== 'undefined' && intermediaryFICode!== null && intermediaryFICode!== ""){
-            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            errTag = errTag + checkMandatory(tag, objElement, val);
         }
     }
     return errTag;
@@ -538,17 +538,17 @@ function verify4200(tag, elementArr, wire) {
         let beneficiaryIdentifier = wire['beneficiaryIdentifier'];
         if(objElement.name === "beneficiaryCode"){
             if(typeof beneficiaryCode !== 'undefined' && beneficiaryCode!== null && beneficiaryCode!== ""){
-                errTag = errTag + checkMandatory(tag, elementArr[1], beneficiaryIdentifier)+" ";
-                errTag = errTag + checkMandatory(tag, elementArr[0], beneficiaryCode)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[1], beneficiaryIdentifier);
+                errTag = errTag + checkMandatory(tag, elementArr[0], beneficiaryCode);
             }
         } else if(objElement.name === "beneficiaryIdentifier"){
             if(typeof beneficiaryIdentifier !== 'undefined' && beneficiaryIdentifier!== null && beneficiaryIdentifier!== ""){
-                errTag = errTag + checkMandatory(tag, elementArr[0], beneficiaryCode)+" ";
-                errTag = errTag + checkMandatory(tag, elementArr[1], beneficiaryIdentifier)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[0], beneficiaryCode);
+                errTag = errTag + checkMandatory(tag, elementArr[1], beneficiaryIdentifier);
             }
         } else if(objElement.name === "beneficiaryName"){
             if(beneficiaryCode == "T"){
-                errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+                errTag = errTag + checkMandatory(tag, objElement, val);
                 let n = val.includes("SWIFT, BIC, BEI");
                 if(n==false){
                     errTag = errTag + tag+ ": beneficiaryName : should contain a SWIFT BIC or BEI if beneficiaryCode = T; ";
@@ -558,20 +558,28 @@ function verify4200(tag, elementArr, wire) {
                 }
             }
         } else {
-            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            errTag = errTag + checkOptional(tag, objElement, val);
         }
         if(typeof intermediaryFICode !== 'undefined' && intermediaryFICode!== null && intermediaryFICode!== ""){
-            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            if(!objElement.name.includes("beneficiaryAddress")){
+                errTag = errTag + checkMandatory(tag, objElement, val);
+            }
         }
         if(typeof beneficiaryFICode !== 'undefined' && beneficiaryFICode!== null && beneficiaryFICode!== ""){
-            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            if(!objElement.name.includes("beneficiaryAddress")){
+                errTag = errTag + checkMandatory(tag, objElement, val);
+            }
         }
         if(busFunCode=="CTR" || busFunCode=="CTP" || busFunCode=="DRW" || busFunCode=="DRC"){
-            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            if(!objElement.name.includes("beneficiaryAddress")){
+                errTag = errTag + checkMandatory(tag, objElement, val);
+            }
         }
         // If 6000 is present then 4200 is mandatory
         if(typeof originToBeneficiaryInfo1 !== 'undefined' && originToBeneficiaryInfo1!== null && originToBeneficiaryInfo1!== ""){
-            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            if(!objElement.name.includes("beneficiaryAddress")){
+                errTag = errTag + checkMandatory(tag, objElement, val);
+            }
         }
     }
     return errTag;
@@ -586,7 +594,7 @@ function verify4320(tag, elementArr, wire) {
     let busFunCode = wire['businessFunctionCode'];
     let localInstrumentCode = wire['localInstrumentCode'];
     if(busFunCode=="CTP" && localInstrumentCode=="COVS"){
-        errTag = errTag + checkMandatory(tag, elementArr[0], referenceForBeneficiary)+" ";
+        errTag = errTag + checkMandatory(tag, elementArr[0], referenceForBeneficiary);
     }
     return errTag;
 }
@@ -609,36 +617,36 @@ function verify4400(tag, elementArr, wire) {
         let accountDebitedName = wire['accountDebitedName'];
         if(objElement.name === "accountDebitedCode"){
             if(typeof accountDebitedCode !== 'undefined' && accountDebitedCode!== null && accountDebitedCode!== ""){
-                errTag = errTag + checkMandatory(tag, elementArr[1], accountDebitedIdentifier)+" ";
-                errTag = errTag + checkMandatory(tag, elementArr[2], accountDebitedName)+" ";
-                errTag = errTag + checkMandatory(tag, elementArr[0], accountDebitedCode)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[1], accountDebitedIdentifier);
+                errTag = errTag + checkMandatory(tag, elementArr[2], accountDebitedName);
+                errTag = errTag + checkMandatory(tag, elementArr[0], accountDebitedCode);
                 if(busFunCode!="DRB" && busFunCode != "DRC" && busFunCode!="DRW" && busFunCode != "SVC"){
                     errTag = errTag + tag+ ": accountDebitedCode is not allowed if 3600.businessFunctionCode is not DRB, DRC, DRW OR SVC; ";
                 }
             }
         } else if(objElement.name === "accountDebitedIdentifier"){
             if(typeof accountDebitedIdentifier !== 'undefined' && accountDebitedIdentifier!== null && accountDebitedIdentifier!== ""){
-                errTag = errTag + checkMandatory(tag, elementArr[0], accountDebitedCode)+" ";
-                errTag = errTag + checkMandatory(tag, elementArr[2], accountDebitedName)+" ";
-                errTag = errTag + checkMandatory(tag, elementArr[1], accountDebitedIdentifier)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[0], accountDebitedCode);
+                errTag = errTag + checkMandatory(tag, elementArr[2], accountDebitedName);
+                errTag = errTag + checkMandatory(tag, elementArr[1], accountDebitedIdentifier);
                 if(busFunCode!="DRB" && busFunCode != "DRC" && busFunCode!="DRW" && busFunCode != "SVC"){
                     errTag = errTag + tag+ ": accountDebitedCode is not allowed if 3600.businessFunctionCode is not DRB, DRC, DRW OR SVC; ";
                 }
             }
         } else if(objElement.name === "accountDebitedName"){
             if(typeof accountDebitedName !== 'undefined' && accountDebitedName!== null && accountDebitedName!== ""){
-                errTag = errTag + checkMandatory(tag, elementArr[0], accountDebitedCode)+" ";
-                errTag = errTag + checkMandatory(tag, elementArr[1], accountDebitedIdentifier)+" ";
-                errTag = errTag + checkMandatory(tag, elementArr[2], accountDebitedName)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[0], accountDebitedCode);
+                errTag = errTag + checkMandatory(tag, elementArr[1], accountDebitedIdentifier);
+                errTag = errTag + checkMandatory(tag, elementArr[2], accountDebitedName);
                 if(busFunCode!="DRB" && busFunCode != "DRC" && busFunCode!="DRW" && busFunCode != "SVC"){
                     errTag = errTag + tag+ ": accountDebitedCode is not allowed if 3600.businessFunctionCode is not DRB, DRC, DRW OR SVC; ";
                 }
             }
         } else {
-            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            errTag = errTag + checkOptional(tag, objElement, val);
         }
         if(busFunCode=="DRB" || busFunCode=="DRC"){
-            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            errTag = errTag + checkMandatory(tag, objElement, val);
         }
     }
     return errTag;
@@ -671,18 +679,18 @@ function verify5000(tag, elementArr, wire) {
         let originatorName = wire['originatorName'];
         if(objElement.name === "originatorCode"){
             if(typeof originatorCode !== 'undefined' && originatorCode!== null && originatorCode!== ""){
-                errTag = errTag + checkMandatory(tag, elementArr[1], originatorIdentifier)+" ";
-                errTag = errTag + checkMandatory(tag, elementArr[0], originatorCode)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[1], originatorIdentifier);
+                errTag = errTag + checkMandatory(tag, elementArr[0], originatorCode);
             }
         } else if(objElement.name === "originatorIdentifier"){
             if(typeof originatorIdentifier !== 'undefined' && originatorIdentifier!== null && originatorIdentifier!== ""){
-                errTag = errTag + checkMandatory(tag, elementArr[0], originatorCode)+" ";
-                errTag = errTag + checkMandatory(tag, elementArr[1], originatorIdentifier)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[0], originatorCode);
+                errTag = errTag + checkMandatory(tag, elementArr[1], originatorIdentifier);
             }
         } else if(objElement.name === "originatorName"){
             if(typeof originatorName !== 'undefined' && originatorName!== null && originatorName!== ""){
                 if(originatorCode == "T"){
-                    errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+                    errTag = errTag + checkMandatory(tag, objElement, val);
                     let n = val.includes("SWIFT, BIC, BEI");
                     if(n==false){
                         errTag = errTag + tag+ ": originatorName : should contain a SWIFT BIC or BEI if originatorCode = T; ";
@@ -693,23 +701,31 @@ function verify5000(tag, elementArr, wire) {
                 }
             }
         } else {
-            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            errTag = errTag + checkOptional(tag, objElement, val);
         }
         // If 5100 is present then 5000 is mandatory
         if(typeof originatorFICode !== 'undefined' && originatorFICode!== null && originatorFICode!== ""){
-            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            if(!objElement.name.includes("originatorAddress")){
+                errTag = errTag + checkMandatory(tag, objElement, val);
+            }
         }
         // If 5200 is present then 5000 is mandatory
         if(typeof instructingFICode !== 'undefined' && instructingFICode!== null && instructingFICode!== ""){
-            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            if(!objElement.name.includes("originatorAddress")){
+                errTag = errTag + checkMandatory(tag, objElement, val);
+            }
         }
         // Also check if 5010 is not present
         if(busFunCode=="CTR" || busFunCode=="CTP"){
-            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            if(!objElement.name.includes("originatorAddress")){
+                errTag = errTag + checkMandatory(tag, objElement, val);
+            }
         }
         // If 6000 is present then 5000 is mandatory
         if(typeof originToBeneficiaryInfo1 !== 'undefined' && originToBeneficiaryInfo1!== null && originToBeneficiaryInfo1!== ""){
-            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            if(!objElement.name.includes("originatorAddress")){
+                errTag = errTag + checkMandatory(tag, objElement, val);
+            }
         }
     }
     return errTag;
@@ -765,9 +781,9 @@ function verify5010(tag, elementArr, wire) {
         // Also check if 5000 is not present
         if(busFunCode=="CTP" && originatorCode==="" && originatorCode===null){
             if(objElement.name === "partyID" || objElement.name === "partyIDUniqeIDType" || objElement.name === "partyName"){
-                errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+                errTag = errTag + checkMandatory(tag, objElement, val);
             } else {
-                errTag = errTag + checkOptional(tag, objElement, val)+" ";
+                errTag = errTag + checkOptional(tag, objElement, val);
             }
         } else {
             if(typeof partyName !== 'undefined' && partyName!== null && partyName!== ""){
@@ -803,20 +819,20 @@ function verify5100(tag, elementArr, wire) {
         let originatorFIIdentifier = wire['originatorFIIdentifier'];
         if(objElement.name === "originatorFICode"){
             if(typeof originatorFICode !== 'undefined' && originatorFICode!== null && originatorFICode!== ""){
-                errTag = errTag + checkMandatory(tag, elementArr[1], originatorFIIdentifier)+" ";
-                errTag = errTag + checkMandatory(tag, elementArr[0], originatorFICode)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[1], originatorFIIdentifier);
+                errTag = errTag + checkMandatory(tag, elementArr[0], originatorFICode);
             }
         } else if(objElement.name === "originatorFIIdentifier"){
             if(typeof originatorFIIdentifier !== 'undefined' && originatorFIIdentifier!== null && originatorFIIdentifier!== ""){
-                errTag = errTag + checkMandatory(tag, elementArr[0], originatorFICode)+" ";
-                errTag = errTag + checkMandatory(tag, elementArr[1], originatorFIIdentifier)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[0], originatorFICode);
+                errTag = errTag + checkMandatory(tag, elementArr[1], originatorFIIdentifier);
             }
         } else {
-            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            errTag = errTag + checkOptional(tag, objElement, val);
         }
         // If 5200 is present then 5100 is mandatory
         if(typeof instructingFICode !== 'undefined' && instructingFICode!== null && instructingFICode!== ""){
-            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            errTag = errTag + checkMandatory(tag, objElement, val);
         }
     }
     return errTag;
@@ -839,16 +855,16 @@ function verify5200(tag, elementArr, wire) {
         let instructingFIIdentifier = wire['instructingFIIdentifier'];
         if(objElement.name === "instructingFICode"){
             if(typeof instructingFICode !== 'undefined' && instructingFICode!== null && instructingFICode!== ""){
-                errTag = errTag + checkMandatory(tag, elementArr[1], instructingFIIdentifier)+" ";
-                errTag = errTag + checkMandatory(tag, elementArr[0], instructingFICode)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[1], instructingFIIdentifier);
+                errTag = errTag + checkMandatory(tag, elementArr[0], instructingFICode);
             }
         } else if(objElement.name === "instructingFIIdentifier"){
             if(typeof instructingFIIdentifier !== 'undefined' && instructingFIIdentifier!== null && instructingFIIdentifier!== ""){
-                errTag = errTag + checkMandatory(tag, elementArr[0], instructingFICode)+" ";
-                errTag = errTag + checkMandatory(tag, elementArr[1], instructingFIIdentifier)+" ";
+                errTag = errTag + checkMandatory(tag, elementArr[0], instructingFICode);
+                errTag = errTag + checkMandatory(tag, elementArr[1], instructingFIIdentifier);
             }
         } else {
-            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            errTag = errTag + checkOptional(tag, objElement, val);
         }
     }
     return errTag;
@@ -862,7 +878,7 @@ function verify5400(tag, elementArr, wire) {
     let busFunCode = wire['businessFunctionCode'];
     let accountCreditedDrawdown = wire['accountCreditedDrawdown'];
     if(busFunCode === "DRB" || busFunCode === "DRC"){
-        errTag = errTag + checkMandatory(tag, elementArr[0], accountCreditedDrawdown)+" ";
+        errTag = errTag + checkMandatory(tag, elementArr[0], accountCreditedDrawdown);
     }
     if(busFunCode !== "DRB" && busFunCode !== "DRC" && busFunCode !== "DRW" && busFunCode !== "SVC"){
         if(typeof accountCreditedDrawdown !== 'undefined' && accountCreditedDrawdown!== null && accountCreditedDrawdown!== ""){
@@ -881,7 +897,7 @@ function verify6000(tag, elementArr, wire) {
     for(var j = 0; j < elementArr.length; j++) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
-        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        errTag = errTag + checkOptional(tag, objElement, val);
     }
     return errTag;
 }
@@ -893,7 +909,7 @@ function verify6100(tag, elementArr, wire) {
     for(var j = 0; j < elementArr.length; j++) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
-        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        errTag = errTag + checkOptional(tag, objElement, val);
     }
     return errTag;
 }
@@ -911,10 +927,10 @@ function verify6110(tag, elementArr, wire) {
         let drawdownDebitAcctCode = wire['drawdownDebitAcctCode'];
         if(objElement.name === "drawdownDebitAcctCode"){
             if(typeof drawdownDebitAcctCode !== 'undefined' && drawdownDebitAcctCode!== null && drawdownDebitAcctCode!== ""){
-                errTag = errTag + checkMandatory(tag, objElement, drawdownDebitAcctCode)+" ";
+                errTag = errTag + checkMandatory(tag, objElement, drawdownDebitAcctCode);
             }
         } else {
-            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            errTag = errTag + checkOptional(tag, objElement, val);
         }
         if(busFunCode!=="DRB" && busFunCode!=="DRC" && busFunCode!=="DRW" && busFunCode!=="SVC"){
             if(typeof val !== 'undefined' && val!== null && val!== ""){
@@ -933,7 +949,7 @@ function verify6200(tag, elementArr, wire) {
     for(var j = 0; j < elementArr.length; j++) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
-        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        errTag = errTag + checkOptional(tag, objElement, val);
         if(typeof val !== 'undefined' && val!== null && val!== ""){
             // Check 4000, 4100, 4200 exist or not
             let intermediaryFICode = wire['intermediaryFICode'];
@@ -965,10 +981,10 @@ function verify6210(tag, elementArr, wire) {
         let intermediaryFIAdviceCode = wire['intermediaryFIAdviceCode'];
         if(objElement.name === "intermediaryFIAdviceCode"){
             if(typeof intermediaryFIAdviceCode !== 'undefined' && intermediaryFIAdviceCode!== null && intermediaryFIAdviceCode!== ""){
-                errTag = errTag + checkMandatory(tag, objElement, intermediaryFIAdviceCode)+" ";
+                errTag = errTag + checkMandatory(tag, objElement, intermediaryFIAdviceCode);
             }
         } else {
-            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            errTag = errTag + checkOptional(tag, objElement, val);
         }
         if(typeof val !== 'undefined' && val!== null && val!== ""){
             // Check 4000, 4100, 4200 exist or not
@@ -997,7 +1013,7 @@ function verify6300(tag, elementArr, wire) {
     for(var j = 0; j < elementArr.length; j++) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
-        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        errTag = errTag + checkOptional(tag, objElement, val);
         if(typeof val !== 'undefined' && val!== null && val!== ""){
             // Check 4100, 4200 exist or not
             let beneficiaryFICode = wire['beneficiaryFICode'];
@@ -1025,10 +1041,10 @@ function verify6310(tag, elementArr, wire) {
         let val = wire[objElement.name];
         if(objElement.name === "beneficiaryFIAdviceCode"){
             if(typeof beneficiaryFIAdviceCode !== 'undefined' && beneficiaryFIAdviceCode!== null && beneficiaryFIAdviceCode!== ""){
-                errTag = errTag + checkMandatory(tag, objElement, beneficiaryFIAdviceCode)+" ";
+                errTag = errTag + checkMandatory(tag, objElement, beneficiaryFIAdviceCode);
             }
         } else {
-            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            errTag = errTag + checkOptional(tag, objElement, val);
         }
         if(typeof val !== 'undefined' && val!== null && val!== ""){
             // Check 4100, 4200 exist or not
@@ -1053,7 +1069,7 @@ function verify6400(tag, elementArr, wire) {
     for(var j = 0; j < elementArr.length; j++) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
-        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        errTag = errTag + checkOptional(tag, objElement, val);
         if(typeof val !== 'undefined' && val!== null && val!== ""){
             // Check 4200 exist or not
             let beneficiaryCode = wire['beneficiaryCode'];
@@ -1077,10 +1093,10 @@ function verify6410(tag, elementArr, wire) {
         let val = wire[objElement.name];
         if(objElement.name === "beneficiaryAdviceCode"){
             if(typeof beneficiaryAdviceCode !== 'undefined' && beneficiaryAdviceCode!== null && beneficiaryAdviceCode!== ""){
-                errTag = errTag + checkMandatory(tag, objElement, beneficiaryAdviceCode)+" ";
+                errTag = errTag + checkMandatory(tag, objElement, beneficiaryAdviceCode);
             }
         } else {
-            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            errTag = errTag + checkOptional(tag, objElement, val);
         }
         if(typeof val !== 'undefined' && val!== null && val!== ""){
             // Check 4200 exist or not
@@ -1104,10 +1120,10 @@ function verify6420(tag, elementArr, wire) {
         let val = wire[objElement.name];
         if(objElement.name === "methodOfPayment"){
             if(typeof methodOfPayment !== 'undefined' && methodOfPayment!== null && methodOfPayment!== ""){
-                errTag = errTag + checkMandatory(tag, objElement, methodOfPayment)+" ";
+                errTag = errTag + checkMandatory(tag, objElement, methodOfPayment);
             }
         } else {
-            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            errTag = errTag + checkOptional(tag, objElement, val);
         }
         if(typeof val !== 'undefined' && val!== null && val!== ""){
             // Check 4200, 6410 exist or not
@@ -1131,7 +1147,7 @@ function verify6500(tag, elementArr, wire) {
     for(var j = 0; j < elementArr.length; j++) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
-        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        errTag = errTag + checkOptional(tag, objElement, val);
     }
     return errTag;
 }
@@ -1151,7 +1167,7 @@ function verify7033(tag, elementArr, wire) {
                 errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
             }
         }
-        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        errTag = errTag + checkOptional(tag, objElement, val);
     }
     return errTag;
 }
@@ -1172,9 +1188,9 @@ function verify7050(tag, elementArr, wire) {
             }
         }
         if(busFunCode == "CTP" && localInstrumentCode == "COVS"){
-            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            errTag = errTag + checkMandatory(tag, objElement, val);
         } else {
-            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            errTag = errTag + checkOptional(tag, objElement, val);
         }
     }
     return errTag;
@@ -1195,7 +1211,7 @@ function verify7052(tag, elementArr, wire) {
                 errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
             }
         }
-        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        errTag = errTag + checkOptional(tag, objElement, val);
     }
     return errTag;
 }
@@ -1215,7 +1231,7 @@ function verify7056(tag, elementArr, wire) {
                 errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
             }
         }
-        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        errTag = errTag + checkOptional(tag, objElement, val);
     }
     return errTag;
 }
@@ -1239,12 +1255,12 @@ function verify7057(tag, elementArr, wire) {
             }
         }
         if(typeof seqBIntermediaryInstitutionTag !== 'undefined' && seqBIntermediaryInstitutionTag !== null && seqBIntermediaryInstitutionTag !== ""){
-            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            errTag = errTag + checkMandatory(tag, objElement, val);
         }
         if(typeof seqBIntermediaryInstitutionLine1 !== 'undefined' && seqBIntermediaryInstitutionLine1 !== null && seqBIntermediaryInstitutionLine1 !== ""){
-            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            errTag = errTag + checkMandatory(tag, objElement, val);
         }
-        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        errTag = errTag + checkOptional(tag, objElement, val);
     }
     return errTag;
 }
@@ -1265,9 +1281,9 @@ function verify7059(tag, elementArr, wire) {
             }
         }
         if(busFunCode == "CTP" && localInstrumentCode == "COVS"){
-            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            errTag = errTag + checkMandatory(tag, objElement, val);
         } else {
-            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            errTag = errTag + checkOptional(tag, objElement, val);
         }
     }
     return errTag;
@@ -1288,7 +1304,7 @@ function verify7070(tag, elementArr, wire) {
                 errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
             }
         }
-        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        errTag = errTag + checkOptional(tag, objElement, val);
     }
     return errTag;
 }
@@ -1308,7 +1324,7 @@ function verify7072(tag, elementArr, wire) {
                 errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
             }
         }
-        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        errTag = errTag + checkOptional(tag, objElement, val);
     }
     return errTag;
 }
@@ -1333,9 +1349,9 @@ function verify8200(tag, elementArr, wire) {
             }
         }
         if(busFunCode == "CTP" && (localInstrumentCode == "ANSI" || localInstrumentCode == "GXML" || localInstrumentCode == "IXML" || localInstrumentCode == "NARR" || localInstrumentCode == "S820" || localInstrumentCode == "SWIF" || localInstrumentCode == "UEDI")){
-            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            errTag = errTag + checkMandatory(tag, objElement, val);
         } else {
-            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            errTag = errTag + checkOptional(tag, objElement, val);
         }
         if(objElement.name === "unstructuredAddendaLength"){
             if(!is_Numeric(val)){
@@ -1382,9 +1398,9 @@ function verify8250(tag, elementArr, wire) {
             }
         }
         if(busFunCode == "CTP" && localInstrumentCode == "RRMT"){
-            errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+            errTag = errTag + checkMandatory(tag, objElement, val);
         } else {
-            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            errTag = errTag + checkOptional(tag, objElement, val);
         }
     }
     return errTag;
@@ -1438,12 +1454,12 @@ function verify8300(tag, elementArr, wire) {
         }
         if(busFunCode == "CTP" && localInstrumentCode == "RMTS"){
             if(objElement.name == "remittanceOrignatorIDType" || objElement.name == "remittanceOrignatorIDCode" || objElement.name == "remittanceOrignatorName"){
-                errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+                errTag = errTag + checkMandatory(tag, objElement, val);
             } else if(objElement.name == "remittanceOrignatorIDNumber"){
                 if(remittanceOrignatorIDCode !== "DPOB"){
-                    errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+                    errTag = errTag + checkMandatory(tag, objElement, val);
                 } else {
-                    errTag = errTag + checkOptional(tag, objElement, val)+" ";
+                    errTag = errTag + checkOptional(tag, objElement, val);
                 }
                 if(typeof remittanceOrignatorIDNumber !== 'undefined' && remittanceOrignatorIDNumber !== null && remittanceOrignatorIDNumber !== "" && remittanceOrignatorIDCode == "DPOB"){
                     errTag = errTag + tag+ ": "+objElement.name+" is not permitted for Identification Code DPOB; ";
@@ -1452,19 +1468,19 @@ function verify8300(tag, elementArr, wire) {
                 if(typeof remittanceOrignatorIDIssuer !== 'undefined' && remittanceOrignatorIDIssuer !== null && remittanceOrignatorIDIssuer !== "" && (remittanceOrignatorIDCode == "DPOB" || remittanceOrignatorIDCode == "SWBB")){
                     errTag = errTag + tag+ ": "+objElement.name+" is not permitted for Identification Code DPOB & SWBB; ";
                 } else {
-                    errTag = errTag + checkOptional(tag, objElement, val)+" ";
+                    errTag = errTag + checkOptional(tag, objElement, val);
                 }
             } else if(objElement.name == "remittanceOrignatorDatePlaceBirth"){
                 if(typeof remittanceOrignatorDatePlaceBirth !== 'undefined' && remittanceOrignatorDatePlaceBirth !== null && remittanceOrignatorDatePlaceBirth !== "" && remittanceOrignatorIDCode !== "DPOB"){
                     errTag = errTag + tag+ ": "+objElement.name+" is only permitted for Identification Code DPOB; ";
                 } else {
-                    errTag = errTag + checkOptional(tag, objElement, val)+" ";
+                    errTag = errTag + checkOptional(tag, objElement, val);
                 }
             } else {  
-                errTag = errTag + checkOptional(tag, objElement, val)+" ";
+                errTag = errTag + checkOptional(tag, objElement, val);
             }            
         } else {
-            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            errTag = errTag + checkOptional(tag, objElement, val);
         }
     }
     return errTag;
@@ -1512,7 +1528,7 @@ function verify8350(tag, elementArr, wire) {
         }
         if(busFunCode == "CTP" && localInstrumentCode == "RMTS"){
             if(objElement.name == "remittanceBeneficiaryName"){
-                errTag = errTag + checkMandatory(tag, objElement, val)+" ";
+                errTag = errTag + checkMandatory(tag, objElement, val);
             } else if(objElement.name == "remittanceBeneficiaryIDNumber"){
                 if(typeof remittanceBeneficiaryIDNumber !== 'undefined' && remittanceBeneficiaryIDNumber !== null && remittanceBeneficiaryIDNumber !== ""){
                     if(remittanceBeneficiaryIDType=="" || remittanceBeneficiaryIDType==null || remittanceBeneficiaryIDCode=="" || remittanceBeneficiaryIDCode==null){
@@ -1535,13 +1551,13 @@ function verify8350(tag, elementArr, wire) {
                 if(typeof remittanceBeneficiaryDatePlaceBirth !== 'undefined' && remittanceBeneficiaryDatePlaceBirth !== null && remittanceBeneficiaryDatePlaceBirth !== "" && remittanceBeneficiaryIDCode !== "DPOB"){
                     errTag = errTag + tag+ ": "+objElement.name+" is only permitted for Identification Code DPOB; ";
                 } else {
-                    errTag = errTag + checkOptional(tag, objElement, val)+" ";
+                    errTag = errTag + checkOptional(tag, objElement, val);
                 }
             } else {  
-                errTag = errTag + checkOptional(tag, objElement, val)+" ";
+                errTag = errTag + checkOptional(tag, objElement, val);
             }            
         } else {
-            errTag = errTag + checkOptional(tag, objElement, val)+" ";
+            errTag = errTag + checkOptional(tag, objElement, val);
         }
     }
     return errTag;
@@ -1561,7 +1577,7 @@ function verify9000(tag, elementArr, wire) {
                 errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = SVC; ";
             }
         }
-        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        errTag = errTag + checkOptional(tag, objElement, val);
     }
     return errTag;
 }
@@ -1583,7 +1599,7 @@ function verify1100(tag, elementArr, wire) {
     for(var j = 0; j < elementArr.length; j++) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
-        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        errTag = errTag + checkOptional(tag, objElement, val);
     }
     return errTag;
 }
@@ -1596,7 +1612,7 @@ function verify1110(tag, elementArr, wire) {
     for(var j = 0; j < elementArr.length; j++) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
-        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        errTag = errTag + checkOptional(tag, objElement, val);
     }
     return errTag;
 }
@@ -1612,7 +1628,7 @@ function verify1120(tag, elementArr, wire) {
     for(var j = 0; j < elementArr.length; j++) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
-        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        errTag = errTag + checkOptional(tag, objElement, val);
     }
     return errTag;
 }
@@ -1629,7 +1645,7 @@ function verify1130(tag, elementArr, wire) {
     for(var j = 0; j < elementArr.length; j++) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
-        errTag = errTag + checkOptional(tag, objElement, val)+" ";
+        errTag = errTag + checkOptional(tag, objElement, val);
     }
     return errTag;
 }
