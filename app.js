@@ -78,29 +78,28 @@ function verify1510(tag, elementArr, wire) {
     }
     return errTag;
 }
-
-function verify1520(tag, elementArr, wire) {
-    /*{1520} Input Message Accountability Data (IMAD)
-    Input Cycle Date (CCYYMMDD)
-    Input Source (8 characters)
-    Input Sequence Number (6 characters)
-    Mandatory
-    Note: Optional for FedLine Advantage® import customers, but if present, must be 22 characters.*/
-    let errTag = "";
-
-    let inputCycleDate = wire['inputCycleDate'];
-    let inputSource = wire['inputSource'];
-    let inputSeqNum = wire['inputSeqNum'];
-
-    if(typeof inputCycleDate  == 'undefined' && typeof inputSource  == 'undefined' && typeof inputSeqNum  == 'undefined'){
-        return "";
-    }
-
-    if (inputCycleDate.length !== 8 || inputSource.length !== 8 || inputSeqNum.length !== 6){
-        return  tag+ ":" +  " not a valid length;";
-    }
-    // verify (CCYYMMDD)
-    return errTag;
+function verify1520(tag, elementArr, wire) {	
+    /*{1520} Input Message Accountability Data (IMAD)	
+    Input Cycle Date (CCYYMMDD)	
+    Input Source (8 characters)	
+    Input Sequence Number (6 characters)	
+    Mandatory	
+    Note: Optional for FedLine Advantage® import customers, but if present, must be 22 characters.*/	
+    let errTag = "";	
+    let inputCycleDate = wire['inputCycleDate'];	
+    let inputSource = wire['inputSource'];	
+    let inputSeqNum = wire['inputSeqNum'];	
+    if(typeof inputCycleDate  == 'undefined' && typeof inputSource  == 'undefined' && typeof inputSeqNum  == 'undefined'){	
+        return "";	
+    }	
+    if (inputCycleDate === null || inputSource === null || inputSeqNum === null){	
+        return  tag+ ":" +  " not a valid length;";	
+    }	
+    if (inputCycleDate.length !== 8 || inputSource.length !== 8 || inputSeqNum.length !== 6){	
+        return  tag+ ":" +  " not a valid length;";	
+    }	
+    // verify (CCYYMMDD)	
+    return errTag;	
 }
 
 function verify2000(tag, elementArr, wire) {
@@ -1354,7 +1353,7 @@ function verify8200(tag, elementArr, wire) {
             errTag = errTag + checkOptional(tag, objElement, val);
         }
         if(objElement.name === "unstructuredAddendaLength"){
-            if(!is_Numeric(val)){
+            if(typeof val !== 'undefined' && val !== null && val !== "" &&  !is_Numeric(val)){
                 errTag = errTag + tag+ ": "+objElement.name+" must be numeric; ";
             }
         }
@@ -1818,8 +1817,8 @@ function verifytag(tag, elementArr, wire){
 }
 //console.log("Total Tag Count:" + tagCnt);
 //console.log("\n");
-console.log("Error:" + errorMsg);
-console.log("\n");
+//console.log("Error:" + errorMsg);
+//console.log("\n");
 
 function checkMandatory(tag, objElement, val){
     //console.log("checkMandatory: tag =" + tag + " objElement=" + JSON.stringify(objElement) + " val=" + val);
@@ -1861,63 +1860,3 @@ function checkOptional(tag, objElement, val){
     }
     return err;
 }
-
-/*
-function checkSpecial(tag, objElement, val, wire){
-    console.log("checkSpecial: tag =" + tag + " objElement=" + JSON.stringify(objElement) + " val=" + val);
-    
-    let err = null;
-    let rule = "";
-    if(objElement.desc !== "" && objElement.desc !== null){
-        let rulesArr = objElement.desc.split(";");
-        if(rulesArr.length>0){
-            for(let k=0; k<rulesArr.length; k++){
-                rule = rulesArr[k];
-                err = getErrorByRule(rule, wire, tag, objElement, val);
-            }
-        } else {
-            rule = objElement.desc;
-            err = getErrorByRule(rule, wire, tag, objElement, val);
-        }
-    }
-    return err;
-}
-
-function getErrorByRule(rule, wire, tag, objElement, val){
-    let err = null;
-    if(rule !== null && rule !== ""){
-        console.log("Processing this : "+rule);
-        if(val !== null && val !== ""){
-            let n = rule.includes("only allowed");
-            if(n === true){
-                let conditionSt = rule.split("if")[1];
-                let condArr = conditionSt.split("AND");
-                for(let k=0; k<condArr.length; k++){
-                    let condition = condArr[k].trim();
-                    console.log(condition);
-                    let condPartArr = condition.split(" ");
-                    let field = condPartArr[0];
-                    if(field.includes(".")){
-                        fieldTag  = field.split(".")[0];
-                        fieldName = field.split(".")[1];
-                    } else {
-                        fieldName = field;
-                    }
-                    let fieldOper = condPartArr[1];
-                    let fieldMatchVal = condPartArr[2];
-                    if(fieldOper=="="){
-                        fieldOper = "===";
-                    }
-                    console.log(wire[fieldName]+fieldOper+fieldMatchVal);
-                    if(wire[fieldName]+fieldOper+fieldMatchVal){
-                        console.log("Matched");
-                    } else {
-                        err = err+tag+":"+objElement.name+": value only allowed "+condition;
-                        console.log(err);
-                    }
-                }
-            }
-        }
-    }
-    return err;
-}*/

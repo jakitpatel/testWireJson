@@ -688,7 +688,7 @@
          "name":"originatorIdentifier",
          "delimiter":"*",
          "mandatory":2,
-         "value":["B","C","D","F","T","U","1","2","3","4","5","9"],
+         "value":"",
          "desc":"mandatory if 5000.originatorCode is present; If 5000.originatorCode = T then 5000.originatorIdentifier must be present and contain an account number"
       },
       {
@@ -833,7 +833,7 @@
          "name":"originatorFIIdentifier",
          "delimiter":"*",
          "mandatory":2,
-         "value":["B","C","D","F","U"],
+         "value":"",
          "desc":"mandatory if 5100.originatorFICode is present"
       },
       {
