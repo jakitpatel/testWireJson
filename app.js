@@ -784,13 +784,13 @@ function verify5010(tag, elementArr, wire) {
                 errTag = errTag + checkOptional(tag, objElement, val);
             }
         } else {
-            if(typeof partyName !== 'undefined' && partyName!== null && partyName!== ""){
+            if(isExist(partyName)){
                 errTag = errTag + tag+ ": partyName is not allowed if 3600.businessFunctionCode is not CTP & {5000} is present; ";
             }
-            if(typeof partyID !== 'undefined' && partyID!== null && partyID!== ""){
+            if(isExist(partyID)){
                 errTag = errTag + tag+ ": partyID is not allowed if 3600.businessFunctionCode is not CTP & {5000} is present; ";
             }
-            if(typeof partyIDUniqeIDType !== 'undefined' && partyIDUniqeIDType!== null && partyIDUniqeIDType!== ""){
+            if(isExist(partyIDUniqeIDType)){
                 errTag = errTag + tag+ ": partyIDUniqeIDType is not allowed if 3600.businessFunctionCode is not CTP & {5000} is present; ";
             }
         }
@@ -816,12 +816,12 @@ function verify5100(tag, elementArr, wire) {
         let originatorFICode = wire['originatorFICode'];
         let originatorFIIdentifier = wire['originatorFIIdentifier'];
         if(objElement.name === "originatorFICode"){
-            if(typeof originatorFICode !== 'undefined' && originatorFICode!== null && originatorFICode!== ""){
+            if(isExist(originatorFICode)){
                 errTag = errTag + checkMandatory(tag, elementArr[1], originatorFIIdentifier);
                 errTag = errTag + checkMandatory(tag, elementArr[0], originatorFICode);
             }
         } else if(objElement.name === "originatorFIIdentifier"){
-            if(typeof originatorFIIdentifier !== 'undefined' && originatorFIIdentifier!== null && originatorFIIdentifier!== ""){
+            if(isExist(originatorFIIdentifier)){
                 errTag = errTag + checkMandatory(tag, elementArr[0], originatorFICode);
                 errTag = errTag + checkMandatory(tag, elementArr[1], originatorFIIdentifier);
             }
@@ -829,7 +829,7 @@ function verify5100(tag, elementArr, wire) {
             errTag = errTag + checkOptional(tag, objElement, val);
         }
         // If 5200 is present then 5100 is mandatory
-        if(typeof instructingFICode !== 'undefined' && instructingFICode!== null && instructingFICode!== ""){
+        if(isExist(instructingFICode)){
             if(objElement.name === "originatorFIIdentifier" || objElement.name === "originatorFICode"){
                 errTag = errTag + checkMandatory(tag, objElement, val);
             }
@@ -854,12 +854,12 @@ function verify5200(tag, elementArr, wire) {
         let instructingFICode = wire['instructingFICode'];
         let instructingFIIdentifier = wire['instructingFIIdentifier'];
         if(objElement.name === "instructingFICode"){
-            if(typeof instructingFICode !== 'undefined' && instructingFICode!== null && instructingFICode!== ""){
+            if(isExist(instructingFICode)){
                 errTag = errTag + checkMandatory(tag, elementArr[1], instructingFIIdentifier);
                 errTag = errTag + checkMandatory(tag, elementArr[0], instructingFICode);
             }
         } else if(objElement.name === "instructingFIIdentifier"){
-            if(typeof instructingFIIdentifier !== 'undefined' && instructingFIIdentifier!== null && instructingFIIdentifier!== ""){
+            if(isExist(instructingFIIdentifier)){
                 errTag = errTag + checkMandatory(tag, elementArr[0], instructingFICode);
                 errTag = errTag + checkMandatory(tag, elementArr[1], instructingFIIdentifier);
             }
@@ -881,7 +881,7 @@ function verify5400(tag, elementArr, wire) {
         errTag = errTag + checkMandatory(tag, elementArr[0], accountCreditedDrawdown);
     }
     if(busFunCode !== "DRB" && busFunCode !== "DRC" && busFunCode !== "DRW" && busFunCode !== "SVC"){
-        if(typeof accountCreditedDrawdown !== 'undefined' && accountCreditedDrawdown!== null && accountCreditedDrawdown!== ""){
+        if(isExist(accountCreditedDrawdown)){
             errTag = errTag + tag+ ": accountCreditedDrawdown only allowed if 3600.businessFunctionCode must be DRB, DRC, DRW OR SVC; ";
         }
     }
@@ -926,14 +926,14 @@ function verify6110(tag, elementArr, wire) {
         let val = wire[objElement.name];
         let drawdownDebitAcctCode = wire['drawdownDebitAcctCode'];
         if(objElement.name === "drawdownDebitAcctCode"){
-            if(typeof drawdownDebitAcctCode !== 'undefined' && drawdownDebitAcctCode!== null && drawdownDebitAcctCode!== ""){
+            if(isExist(drawdownDebitAcctCode)){
                 errTag = errTag + checkMandatory(tag, objElement, drawdownDebitAcctCode);
             }
         } else {
             errTag = errTag + checkOptional(tag, objElement, val);
         }
         if(busFunCode!=="DRB" && busFunCode!=="DRC" && busFunCode!=="DRW" && busFunCode!=="SVC"){
-            if(typeof val !== 'undefined' && val!== null && val!== ""){
+            if(isExist(val)){
                 errTag = errTag + tag+ ": "+objElement.name+" only allowed if 3600.businessFunctionCode must be DRB, DRC, DRW OR SVC; ";
             }
         }
@@ -950,7 +950,7 @@ function verify6200(tag, elementArr, wire) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
         errTag = errTag + checkOptional(tag, objElement, val);
-        if(typeof val !== 'undefined' && val!== null && val!== ""){
+        if(isExist(val)){
             // Check 4000, 4100, 4200 exist or not
             let intermediaryFICode = wire['intermediaryFICode'];
             if(typeof intermediaryFICode == 'undefined' && intermediaryFICode== null && intermediaryFICode== ""){
@@ -980,13 +980,13 @@ function verify6210(tag, elementArr, wire) {
         let val = wire[objElement.name];
         let intermediaryFIAdviceCode = wire['intermediaryFIAdviceCode'];
         if(objElement.name === "intermediaryFIAdviceCode"){
-            if(typeof intermediaryFIAdviceCode !== 'undefined' && intermediaryFIAdviceCode!== null && intermediaryFIAdviceCode!== ""){
+            if(isExist(intermediaryFIAdviceCode)){
                 errTag = errTag + checkMandatory(tag, objElement, intermediaryFIAdviceCode);
             }
         } else {
             errTag = errTag + checkOptional(tag, objElement, val);
         }
-        if(typeof val !== 'undefined' && val!== null && val!== ""){
+        if(isExist(val)){
             // Check 4000, 4100, 4200 exist or not
             let intermediaryFICode = wire['intermediaryFICode'];
             if(typeof intermediaryFICode == 'undefined' && intermediaryFICode== null && intermediaryFICode== ""){
@@ -1014,7 +1014,7 @@ function verify6300(tag, elementArr, wire) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
         errTag = errTag + checkOptional(tag, objElement, val);
-        if(typeof val !== 'undefined' && val!== null && val!== ""){
+        if(isExist(val)){
             // Check 4100, 4200 exist or not
             let beneficiaryFICode = wire['beneficiaryFICode'];
             if(typeof beneficiaryFICode == 'undefined' && beneficiaryFICode == null && beneficiaryFICode == ""){
@@ -1040,13 +1040,13 @@ function verify6310(tag, elementArr, wire) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
         if(objElement.name === "beneficiaryFIAdviceCode"){
-            if(typeof beneficiaryFIAdviceCode !== 'undefined' && beneficiaryFIAdviceCode!== null && beneficiaryFIAdviceCode!== ""){
+            if(isExist(beneficiaryFIAdviceCode)){
                 errTag = errTag + checkMandatory(tag, objElement, beneficiaryFIAdviceCode);
             }
         } else {
             errTag = errTag + checkOptional(tag, objElement, val);
         }
-        if(typeof val !== 'undefined' && val!== null && val!== ""){
+        if(isExist(val)){
             // Check 4100, 4200 exist or not
             let beneficiaryFICode = wire['beneficiaryFICode'];
             if(typeof beneficiaryFICode == 'undefined' && beneficiaryFICode == null && beneficiaryFICode == ""){
@@ -1070,7 +1070,7 @@ function verify6400(tag, elementArr, wire) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
         errTag = errTag + checkOptional(tag, objElement, val);
-        if(typeof val !== 'undefined' && val!== null && val!== ""){
+        if(isExist(val)){
             // Check 4200 exist or not
             let beneficiaryCode = wire['beneficiaryCode'];
             if(typeof beneficiaryCode == 'undefined' && beneficiaryCode == null && beneficiaryCode == ""){
@@ -1092,13 +1092,13 @@ function verify6410(tag, elementArr, wire) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
         if(objElement.name === "beneficiaryAdviceCode"){
-            if(typeof beneficiaryAdviceCode !== 'undefined' && beneficiaryAdviceCode!== null && beneficiaryAdviceCode!== ""){
+            if(isExist(beneficiaryAdviceCode)){
                 errTag = errTag + checkMandatory(tag, objElement, beneficiaryAdviceCode);
             }
         } else {
             errTag = errTag + checkOptional(tag, objElement, val);
         }
-        if(typeof val !== 'undefined' && val!== null && val!== ""){
+        if(isExist(val)){
             // Check 4200 exist or not
             let beneficiaryCode = wire['beneficiaryCode'];
             if(typeof beneficiaryCode == 'undefined' && beneficiaryCode == null && beneficiaryCode == ""){
@@ -1119,13 +1119,13 @@ function verify6420(tag, elementArr, wire) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
         if(objElement.name === "methodOfPayment"){
-            if(typeof methodOfPayment !== 'undefined' && methodOfPayment!== null && methodOfPayment!== ""){
+            if(isExist(methodOfPayment)){
                 errTag = errTag + checkMandatory(tag, objElement, methodOfPayment);
             }
         } else {
             errTag = errTag + checkOptional(tag, objElement, val);
         }
-        if(typeof val !== 'undefined' && val!== null && val!== ""){
+        if(isExist(val)){
             // Check 4200, 6410 exist or not
             let beneficiaryCode = wire['beneficiaryCode'];
             if(typeof beneficiaryCode == 'undefined' && beneficiaryCode == null && beneficiaryCode == ""){
@@ -1163,7 +1163,7 @@ function verify7033(tag, elementArr, wire) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
         if(busFunCode !== "CTP" && localInstrumentCode !== "COVS"){
-            if(typeof val !== 'undefined' && val !== null && val !== ""){
+            if(isExist(val)){
                 errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
             }
         }
@@ -1183,7 +1183,7 @@ function verify7050(tag, elementArr, wire) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
         if(busFunCode !== "CTP" && localInstrumentCode !== "COVS"){
-            if(typeof val !== 'undefined' && val !== null && val !== ""){
+            if(isExist(val)){
                 errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
             }
         }
@@ -1207,7 +1207,7 @@ function verify7052(tag, elementArr, wire) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
         if(busFunCode !== "CTP" && localInstrumentCode !== "COVS"){
-            if(typeof val !== 'undefined' && val !== null && val !== ""){
+            if(isExist(val)){
                 errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
             }
         }
@@ -1227,7 +1227,7 @@ function verify7056(tag, elementArr, wire) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
         if(busFunCode !== "CTP" && localInstrumentCode !== "COVS"){
-            if(typeof val !== 'undefined' && val !== null && val !== ""){
+            if(isExist(val)){
                 errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
             }
         }
@@ -1250,14 +1250,14 @@ function verify7057(tag, elementArr, wire) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
         if(busFunCode !== "CTP" && localInstrumentCode !== "COVS"){
-            if(typeof val !== 'undefined' && val !== null && val !== ""){
+            if(isExist(val)){
                 errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
             }
         }
-        if(typeof seqBIntermediaryInstitutionTag !== 'undefined' && seqBIntermediaryInstitutionTag !== null && seqBIntermediaryInstitutionTag !== ""){
+        if(isExist(seqBIntermediaryInstitutionTag)){
             errTag = errTag + checkMandatory(tag, objElement, val);
         }
-        if(typeof seqBIntermediaryInstitutionLine1 !== 'undefined' && seqBIntermediaryInstitutionLine1 !== null && seqBIntermediaryInstitutionLine1 !== ""){
+        if(isExist(seqBIntermediaryInstitutionLine1)){
             errTag = errTag + checkMandatory(tag, objElement, val);
         }
         errTag = errTag + checkOptional(tag, objElement, val);
@@ -1276,7 +1276,7 @@ function verify7059(tag, elementArr, wire) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
         if(busFunCode !== "CTP" && localInstrumentCode !== "COVS"){
-            if(typeof val !== 'undefined' && val !== null && val !== ""){
+            if(isExist(val)){
                 errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
             }
         }
@@ -1300,7 +1300,7 @@ function verify7070(tag, elementArr, wire) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
         if(busFunCode !== "CTP" && localInstrumentCode !== "COVS"){
-            if(typeof val !== 'undefined' && val !== null && val !== ""){
+            if(isExist(val)){
                 errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
             }
         }
@@ -1320,7 +1320,7 @@ function verify7072(tag, elementArr, wire) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
         if(busFunCode !== "CTP" && localInstrumentCode !== "COVS"){
-            if(typeof val !== 'undefined' && val !== null && val !== ""){
+            if(isExist(val)){
                 errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = COVS; ";
             }
         }
@@ -1344,7 +1344,7 @@ function verify8200(tag, elementArr, wire) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
         if(busFunCode !== "CTP" && localInstrumentCode !== "ANSI" && localInstrumentCode !== "GXML" && localInstrumentCode !== "IXML" && localInstrumentCode !== "NARR" && localInstrumentCode !== "S820" && localInstrumentCode !== "SWIF" && localInstrumentCode !== "UEDI"){
-            if(typeof val !== 'undefined' && val !== null && val !== ""){
+            if(isExist(val)){
                 errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode is in (ANSI, GXML, IXML, NARR, S820, SWIF or UEDI); ";
             }
         }
@@ -1354,7 +1354,7 @@ function verify8200(tag, elementArr, wire) {
             errTag = errTag + checkOptional(tag, objElement, val);
         }
         if(objElement.name === "unstructuredAddendaLength"){
-            if(typeof val !== 'undefined' && val !== null && val !== "" &&  !is_Numeric(val)){
+            if(isExist(val) &&  !is_Numeric(val)){
                 errTag = errTag + tag+ ": "+objElement.name+" must be numeric; ";
             }
         }
@@ -1393,7 +1393,7 @@ function verify8250(tag, elementArr, wire) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
         if(busFunCode !== "CTP" && localInstrumentCode !== "RRMT"){
-            if(typeof val !== 'undefined' && val !== null && val !== ""){
+            if(isExist(val)){
                 errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = RRMT; ";
             }
         }
@@ -1448,7 +1448,7 @@ function verify8300(tag, elementArr, wire) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
         if(busFunCode !== "CTP" && localInstrumentCode !== "RMTS"){
-            if(typeof val !== 'undefined' && val !== null && val !== ""){
+            if(isExist(val)){
                 errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = RMTS; ";
             }
         }
@@ -1461,17 +1461,17 @@ function verify8300(tag, elementArr, wire) {
                 } else {
                     errTag = errTag + checkOptional(tag, objElement, val);
                 }
-                if(typeof remittanceOrignatorIDNumber !== 'undefined' && remittanceOrignatorIDNumber !== null && remittanceOrignatorIDNumber !== "" && remittanceOrignatorIDCode == "DPOB"){
+                if(isExist(remittanceOrignatorIDNumber) && remittanceOrignatorIDCode == "DPOB"){
                     errTag = errTag + tag+ ": "+objElement.name+" is not permitted for Identification Code DPOB; ";
                 }
             } else if(objElement.name == "remittanceOrignatorIDIssuer"){
-                if(typeof remittanceOrignatorIDIssuer !== 'undefined' && remittanceOrignatorIDIssuer !== null && remittanceOrignatorIDIssuer !== "" && (remittanceOrignatorIDCode == "DPOB" || remittanceOrignatorIDCode == "SWBB")){
+                if(isExist(remittanceOrignatorIDIssuer) && (remittanceOrignatorIDCode == "DPOB" || remittanceOrignatorIDCode == "SWBB")){
                     errTag = errTag + tag+ ": "+objElement.name+" is not permitted for Identification Code DPOB & SWBB; ";
                 } else {
                     errTag = errTag + checkOptional(tag, objElement, val);
                 }
             } else if(objElement.name == "remittanceOrignatorDatePlaceBirth"){
-                if(typeof remittanceOrignatorDatePlaceBirth !== 'undefined' && remittanceOrignatorDatePlaceBirth !== null && remittanceOrignatorDatePlaceBirth !== "" && remittanceOrignatorIDCode !== "DPOB"){
+                if(isExist(remittanceOrignatorDatePlaceBirth) && remittanceOrignatorIDCode !== "DPOB"){
                     errTag = errTag + tag+ ": "+objElement.name+" is only permitted for Identification Code DPOB; ";
                 } else {
                     errTag = errTag + checkOptional(tag, objElement, val);
@@ -1522,7 +1522,7 @@ function verify8350(tag, elementArr, wire) {
         let objElement = elementArr[j];
         let val = wire[objElement.name];
         if(busFunCode !== "CTP" && localInstrumentCode !== "RMTS"){
-            if(typeof val !== 'undefined' && val !== null && val !== ""){
+            if(isExist(val)){
                 errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = RMTS; ";
             }
         }
@@ -1530,7 +1530,7 @@ function verify8350(tag, elementArr, wire) {
             if(objElement.name == "remittanceBeneficiaryName"){
                 errTag = errTag + checkMandatory(tag, objElement, val);
             } else if(objElement.name == "remittanceBeneficiaryIDNumber"){
-                if(typeof remittanceBeneficiaryIDNumber !== 'undefined' && remittanceBeneficiaryIDNumber !== null && remittanceBeneficiaryIDNumber !== ""){
+                if(isExist(remittanceBeneficiaryIDNumber)){
                     if(remittanceBeneficiaryIDType=="" || remittanceBeneficiaryIDType==null || remittanceBeneficiaryIDCode=="" || remittanceBeneficiaryIDCode==null){
                         errTag = errTag + tag+ ": "+objElement.name+" is not permitted unless Identification Type and Identification Code are present; ";
                     }
