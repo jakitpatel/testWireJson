@@ -383,14 +383,13 @@ function verify3710(tag, elementArr, wire) {
             errTag = errTag + tag+ ": instructedAmountCurrencyCode : only allowed if 3610.localInstrumentCode not COVS; ";
         } else {
             // check Val from values & length
-            errTag = errTag + checkMandatory(tag, elementArr[0], instAmtCurrCode);
+            let exchangeRate = wire['exchangeRate'];
+            if(exchangeRate!==null && exchangeRate!==""){
+                errTag = errTag + checkMandatory(tag, elementArr[0], instAmtCurrCode);
+                errTag = errTag + checkMandatory(tag, elementArr[1], instructedAmount);
+            }
+            //errTag = errTag + checkMandatory(tag, elementArr[0], instAmtCurrCode);
         }
-    }
-
-    let exchangeRate = wire['exchangeRate'];
-    if(exchangeRate!==null && exchangeRate!==""){
-        errTag = errTag + checkMandatory(tag, elementArr[0], instAmtCurrCode);
-        errTag = errTag + checkMandatory(tag, elementArr[1], instructedAmount);
     }
 
     let letters = /^[A-Za-z]+$/;
@@ -831,7 +830,9 @@ function verify5100(tag, elementArr, wire) {
         }
         // If 5200 is present then 5100 is mandatory
         if(typeof instructingFICode !== 'undefined' && instructingFICode!== null && instructingFICode!== ""){
-            errTag = errTag + checkMandatory(tag, objElement, val);
+            if(objElement.name === "originatorFIIdentifier" || objElement.name === "originatorFICode"){
+                errTag = errTag + checkMandatory(tag, objElement, val);
+            }
         }
     }
     return errTag;
