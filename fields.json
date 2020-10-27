@@ -324,7 +324,7 @@
          "name":"sendersChargesAmount1",
          "delimiter":"",
          "mandatory":0,
-         "value":"[0-9][0-9,]*",
+         "value":"",
          "desc":"only allowed if 3610.localInstrumentCode != COVS"
       },
       {
@@ -342,7 +342,7 @@
          "name":"sendersChargesAmount2",
          "delimiter":"",
          "mandatory":0,
-         "value":"[0-9][0-9,]*",
+         "value":"",
          "desc":"only allowed if 3610.localInstrumentCode != COVS"
       },
       {
@@ -360,7 +360,7 @@
          "name":"sendersChargesAmount3",
          "delimiter":"",
          "mandatory":0,
-         "value":"[0-9][0-9,]*",
+         "value":"",
          "desc":"only allowed if 3610.localInstrumentCode != COVS"
       },
       {
@@ -378,7 +378,7 @@
          "name":"sendersChargesAmount4",
          "delimiter":"",
          "mandatory":0,
-         "value":"[0-9][0-9,]*",
+         "value":"",
          "desc":"only allowed if 3610.localInstrumentCode != COVS"
       }
    ]
