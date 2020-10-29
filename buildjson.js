@@ -6,6 +6,7 @@ let fields = require("./fields.json");
 let st = "{1100}30P N{1110}09040117FT03{1120}20200904abcFNP6312346009040117FT03";
 st = "{1100}30P N{1110}09090918FT03{1120}2{1510}1000{1520}2{2000}808260.00{3100}012345008C*{3320}SWF123456253*{3400}026002574B*{3600}CTP{3710}USD808260,00*{4200}D8312345143*K*U*N*{4320}P*{5000}D22123123451*UD*6*B*{5100}L*WD*1D*RE*L*{5200}B*B0*1E*P*{6500}R{30000}2{30001}2";
 st = "{4200}D8310613143*KNOWLEABCMARKET LIMITED*UNIT NO. 604-555,4G OPAL TOWER,BUSI*NESS BAY*";
+st = "{3700}SUSD0,00*";
 //console.log(fields);
 let inputObj = {};
 let firstArr = st.split("{");
@@ -56,7 +57,9 @@ Object.entries(inputObj).forEach(
                         len = index+1;
                     }
                 }
-                outputObj[fieldName] = fieldVal;
+                if(fieldVal!==null && fieldVal!==''){
+                    outputObj[fieldName] = fieldVal;
+                }
                 charCnt = charCnt + parseInt(len);
             }
         }
