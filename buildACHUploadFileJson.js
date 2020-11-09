@@ -24,7 +24,8 @@ function createAchJson(line){
             //fileRecArr.push(fileRecObj);
         } 
     });
-
+    return fileRecArr;
+    /*
     /// Final Json Output Object
     let outputObj = {
         "resource":[]
@@ -35,6 +36,7 @@ function createAchJson(line){
     };
     outputObj.resource.push(fileOutoutObj);
     return outputObj;
+    */
 }
 
 function getJsonFileHeaderRecord(line){
