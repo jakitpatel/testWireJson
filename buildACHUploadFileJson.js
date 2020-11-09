@@ -1,16 +1,3 @@
-// Importing the Required Modules 
-const fs = require('fs'); 
-const readline = require('readline'); 
-  
-// Creating a readable stream from file 
-// readline module reads line by line  
-// but from a readable stream only. 
-const file = readline.createInterface({ 
-    input: fs.createReadStream('inputText.txt'), 
-    output: process.stdout, 
-    terminal: false
-});
-
 /// Final Json Output Object
 let outputObj = {
     "resource":[]
@@ -22,29 +9,27 @@ let fileOutoutObj = {
 
 let fileRecArr = [];
 
-// Printing the content of file line by 
-//  line to console by listening on the 
-// line event which will triggered 
-// whenever a new line is read from 
-// the stream 
-file.on('line', (line) => { 
-    console.log(line);
-    let recTypeCode = line.substr(0, 1);
-    //console.log("recTypeCode : "+recTypeCode);
-    let fileRecObj = {};
-    if(recTypeCode==="1"){ 
-        //FILE HEADER RECORD (‘1’ RECORD) 
-        fileRecObj = getJsonFileHeaderRecord(line);
-        fileRecArr.push(fileRecObj);
-    } 
-})
-.on('close', function(line) {
-    // EOF
-    fileOutoutObj.ACHFileRecord_NEW_by_uploadedFilesID = fileRecArr;
-    outputObj.resource.push(fileOutoutObj);
-    console.log(JSON.stringify(outputObj));
-    //console.log(outputObj);
-});
+let lineInput = "101 06200001919999999990509211317A094101Regions Bank           XYZ Company            Ref Coder\r\n5200XYZ";
+let achJson = createAchJson(lineInput);
+
+function createAchJson(line){
+    let lines = line.split("\r\n");
+    let wirearray =[];
+    console.log("lines.length = " + lines.length);
+    // convert each line to JSONdb format
+    //
+    lines.forEach(function (line) {
+        //console.log("line=" + line); 
+        let recTypeCode = line.substr(0, 1);
+        //console.log("recTypeCode : "+recTypeCode);
+        let fileRecObj = {};
+        if(recTypeCode==="1"){ 
+            //FILE HEADER RECORD (‘1’ RECORD) 
+            fileRecObj = getJsonFileHeaderRecord(line);
+            fileRecArr.push(fileRecObj);
+        } 
+    });
+}
 
 function getJsonFileHeaderRecord(line){
     let fileRecObj = {};
@@ -69,3 +54,8 @@ function getJsonFileHeaderRecord(line){
     }
     return fileRecObj;
 }
+
+//Display Output
+fileOutoutObj.ACHFileRecord_NEW_by_uploadedFilesID = fileRecArr;
+outputObj.resource.push(fileOutoutObj);
+console.log(JSON.stringify(outputObj));
