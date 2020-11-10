@@ -1,5 +1,8 @@
 let lineInput = "101 06200001919999999990509211317A094101Regions Bank           XYZ Company            Ref Coder\r\n";
 lineInput += "5200XYZ Company     Discretionary Data  1999999999PPDPAYROLL   050921050923   1062000010000001\r\n";
+lineInput += "622062000019123456789        00001250251001           Harper, John            0062000010000001\r\n";
+lineInput += "622062000019123456789        00001303251002           Brown, Grg              0062000010000002\r\n";
+lineInput += "622062000019123456789        00001516221003           Jones, Sara             0062000010000003\r\n";
 lineInput += "820000001300829505630000000000000000018639771999999999                         062000010000001\r\n";
 lineInput += "9000001000002000000130082950563000000000000000001863977                                       \r\n";
 lineInput += "9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999";
@@ -7,10 +10,15 @@ let achJson = createAchJson(lineInput);
 console.log(JSON.stringify(achJson));
 
 function createAchJson(line){
+    //File Array & Obj
     let fileRecArr = [];
-    let batchRecArr = [];
     let fileRecObj = {};
+    //Batch Array & Obj
+    let batchRecArr = [];
     let batchRecObj = {};
+    //Detail Array & Obj
+    let entrDtRecArr = [];
+    let entrDtRecObj = {};
 
     let lines = line.split("\r\n");
     //console.log("lines.length = " + lines.length);
@@ -25,12 +33,19 @@ function createAchJson(line){
             fileRecObj = getJsonFileHeaderRecord(line);
         } else if(recTypeCode==="5"){ 
             //BATCH HEADER RECORD (‘5’ RECORD)
+            batchRecObj = {};
             batchRecObj = getJsonBatchHeaderRecord(line);
 
             ////
             //batchRecArr.push(batchRecObj);
             //fileRecObj.ACHBatchRecord_NEW_by_fileRecordID = batchRecArr;
             //fileRecArr.push(fileRecObj);
+        } else if(recTypeCode==="6"){ 
+            //ENTRY DETAIL RECORD (‘6’ RECORD)
+            entrDtRecObj = {};
+            entrDtRecObj = getJsonEntryDetailRecord(line);
+            entrDtRecArr.push(entrDtRecObj);
+            batchRecObj.ACHEntryDetail_NEW_by_batchRecordID = entrDtRecArr;
         } else if(recTypeCode==="8"){ 
             //BATCH CONTROL (TRAILER) RECORD (‘8’ RECORD)
             let batchRecTrailerObj = getJsonBatchTrailerRecord(line);
@@ -162,6 +177,31 @@ function getJsonBatchTrailerRecord(line){
     }
     batchTrilerRecObj["RawDataRecord8"] = line;
     return batchTrilerRecObj;
+}
+
+function getJsonEntryDetailRecord(line){
+    let entrDtRecObj = {};
+    let entrDtRecDict = [{"fieldName":"TransactionCode","size":"2"},
+                          {"fieldName":"RDFID","size":"9"},
+                          {"fieldName":"DFIAccountNumber","size":"17"},
+                          {"fieldName":"Amount","size":"10"},
+                          {"fieldName":"IndivIDNumber","size":"15"},
+                          {"fieldName":"IndivName","size":"22"},
+                          {"fieldName":"DiscretionaryData","size":"2"},
+                          {"fieldName":"AddendaRecordIndicator","size":"1"},
+                          {"fieldName":"TraceNumber","size":"15"}];
+    let charCnt = 1;
+    for(let j=0; j<entrDtRecDict.length; j++){
+        let size = entrDtRecDict[j].size;
+        let fldName = entrDtRecDict[j].fieldName;
+        fieldVal = line.substr(charCnt, size);
+        if(fldName!=="AddendaRecordIndicator" && fldName!=="DiscretionaryData"){
+            entrDtRecObj[fldName] = fieldVal;
+        }
+        charCnt = charCnt + parseInt(size);
+    }
+    entrDtRecObj["RawDataRecord6"] = line;
+    return entrDtRecObj;
 }
 
 function getFormattedDateTime(fieldVal){
