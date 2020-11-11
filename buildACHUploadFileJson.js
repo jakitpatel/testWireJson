@@ -1,6 +1,7 @@
 let lineInput = "101 06200001919999999990509211317A094101Regions Bank           XYZ Company            Ref Coder\r\n";
 lineInput += "5200XYZ Company     Discretionary Data  1999999999PPDPAYROLL   050921050923   1062000010000001\r\n";
-lineInput += "622062000019123456789        00001250251001           Harper, John            0062000010000001\r\n";
+lineInput += "622062000019123456789        00001250251001           Harper, John            1062000010000001\r\n";
+lineInput += "799R29026073150000002      12100024                                            091000016093091\r\n";
 lineInput += "622062000019123456789        00001303251002           Brown, Grg              0062000010000002\r\n";
 lineInput += "622062000019123456789        00001516221003           Jones, Sara             0062000010000003\r\n";
 lineInput += "820000001300829505630000000000000000018639771999999999                         062000010000001\r\n";
@@ -19,13 +20,16 @@ function createAchJson(line){
     //Detail Array & Obj
     let entrDtRecArr = [];
     let entrDtRecObj = {};
+    //ADDENDA Array & Obj
+    let addendaRecArr = [];
+    let addendaRecObj = {};
 
     let lines = line.split("\r\n");
     //console.log("lines.length = " + lines.length);
     // convert each line to JSONdb format
     //
     lines.forEach(function (line) {
-        //console.log("line=" + line); 
+        //console.log("\nline=" + line+"\n"); 
         let recTypeCode = line.substr(0, 1);
         //console.log("recTypeCode : "+recTypeCode);
         if(recTypeCode==="1"){ 
@@ -36,7 +40,6 @@ function createAchJson(line){
             batchRecObj = {};
             batchRecObj = getJsonBatchHeaderRecord(line);
 
-            ////
             //batchRecArr.push(batchRecObj);
             //fileRecObj.ACHBatchRecord_NEW_by_fileRecordID = batchRecArr;
             //fileRecArr.push(fileRecObj);
@@ -44,6 +47,19 @@ function createAchJson(line){
             //ENTRY DETAIL RECORD (‘6’ RECORD)
             entrDtRecObj = {};
             entrDtRecObj = getJsonEntryDetailRecord(line);
+            let addendaRecIndicator = line.substr(78, 1);
+            //console.log("\naddendaRecIndicator : "+addendaRecIndicator+"\n");
+            if( parseInt(addendaRecIndicator) === 0){
+                entrDtRecArr.push(entrDtRecObj);
+                batchRecObj.ACHEntryDetail_NEW_by_batchRecordID = entrDtRecArr;
+            }
+        }  else if(recTypeCode==="7"){ 
+            //ENTRY DETAIL RECORD (‘6’ RECORD)
+            addendaRecObj = {};
+            addendaRecObj = getJsonAddendaRecord(line);
+            addendaRecArr.push(addendaRecObj);
+            entrDtRecObj.ACHAddendaRecord_NEW_by_entryDetailID = addendaRecArr;
+
             entrDtRecArr.push(entrDtRecObj);
             batchRecObj.ACHEntryDetail_NEW_by_batchRecordID = entrDtRecArr;
         } else if(recTypeCode==="8"){ 
@@ -110,6 +126,9 @@ function getJsonFileTrailerRecord(line){
         let size = fileRecTrailDict[j].size;
         let fldName = fileRecTrailDict[j].fieldName;
         fieldVal = line.substr(charCnt, size);
+        if(fldName==="TotalDebit" || fldName==="TotalCredit"){
+            fieldVal = parseFloat(fieldVal);
+        }
         if(fldName!=="Reserved"){
             fileRecTrailObj[fldName] = fieldVal;
         }
@@ -138,7 +157,7 @@ function getJsonBatchHeaderRecord(line){
         let size = batchHdrRecDict[j].size;
         let fldName = batchHdrRecDict[j].fieldName;
         fieldVal = line.substr(charCnt, size);
-        if(fldName==="CompanyDescriptiveDate" || fldName==="EffectiveEntryDate"){
+        if(fldName==="EffectiveEntryDate"){
             fieldVal = getFormattedDate(fieldVal);
         }
         if(fldName!=="SattlementDate"){
@@ -167,9 +186,9 @@ function getJsonBatchTrailerRecord(line){
         let size = batchTrailerRecDict[j].size;
         let fldName = batchTrailerRecDict[j].fieldName;
         fieldVal = line.substr(charCnt, size);
-        /*if(fldName==="CompanyDescriptiveDate" || fldName==="EffectiveEntryDate"){
-            fieldVal = getFormattedDate(fieldVal);
-        }*/
+        if(fldName==="TotalDebitAmount" || fldName==="TotalCreditAmount"){
+            fieldVal = parseFloat(fieldVal);
+        }
         if(fldName!=="ServiceClassCode" && fldName!=="CompanyID" && fldName!=="MsgAuthenticationCode" && fldName!=="Reserved" && fldName!=="OriginatingDFI" && fldName!=="BatchNumber"){
             batchTrilerRecObj[fldName] = fieldVal;
         }
@@ -195,6 +214,11 @@ function getJsonEntryDetailRecord(line){
         let size = entrDtRecDict[j].size;
         let fldName = entrDtRecDict[j].fieldName;
         fieldVal = line.substr(charCnt, size);
+        if(fldName==="Amount"){
+            var amt = fieldVal.substr(0, 8);
+            var dec = fieldVal.substr(8, 2);
+            fieldVal = parseFloat(amt+"."+dec);
+        }
         if(fldName!=="AddendaRecordIndicator" && fldName!=="DiscretionaryData"){
             entrDtRecObj[fldName] = fieldVal;
         }
@@ -202,6 +226,27 @@ function getJsonEntryDetailRecord(line){
     }
     entrDtRecObj["RawDataRecord6"] = line;
     return entrDtRecObj;
+}
+
+function getJsonAddendaRecord(line){
+    let addendaRecObj = {};
+    let addendaRecDict = [{"fieldName":"AddendaTypeCode","size":"2"},
+                          {"fieldName":"ReturnCorrectionCode","size":"3"},
+                          {"fieldName":"PaymentInfo","size":"80"},
+                          {"fieldName":"AddendaSEQ","size":"4"},
+                          {"fieldName":"EntryDetailSEQ","size":"7"}];
+    let charCnt = 1;
+    for(let j=0; j<addendaRecDict.length; j++){
+        let size = addendaRecDict[j].size;
+        let fldName = addendaRecDict[j].fieldName;
+        fieldVal = line.substr(charCnt, size);
+        addendaRecObj[fldName] = fieldVal;
+        if(fldName!=="ReturnCorrectionCode"){
+            charCnt = charCnt + parseInt(size);
+        }
+    }
+    addendaRecObj["RawDataRecord7"] = line;
+    return addendaRecObj;
 }
 
 function getFormattedDateTime(fieldVal){
