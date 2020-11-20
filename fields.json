@@ -2232,7 +2232,8 @@
          "delimiter":"",
          "mandatory":1,
          "value":["OI","PI"],
-         "desc":"mandatory if 3600.businessFunctionCode = CTP AND 3610.localInstrumentCode = RMTS"
+         "desc":"mandatory if 3600.businessFunctionCode = CTP AND 3610.localInstrumentCode = RMTS",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":2,
@@ -2241,7 +2242,8 @@
          "delimiter":"",
          "mandatory":1,
          "value":["BANK","CUST","DUNS","EMPL","GS1G","PROP","SWBB","TXID","ARNU","CCPT","CUST","DPOB","DRLC","EMPL","NIDN","PROP","SOSE","TXID"],
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":3,
@@ -2250,7 +2252,8 @@
          "delimiter":"*",
          "mandatory":1,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":4,
@@ -2259,7 +2262,8 @@
          "delimiter":"*",
          "mandatory":2,
          "value":"",
-         "desc":"mandatory if 8300.remittanceOrignatorIDCode != DPOB; only allowed if 8300.remittanceOrignatorIDCode != DPOB"
+         "desc":"mandatory if 8300.remittanceOrignatorIDCode != DPOB; only allowed if 8300.remittanceOrignatorIDCode != DPOB",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":5,
@@ -2268,7 +2272,8 @@
          "delimiter":"*",
          "mandatory":2,
          "value":"",
-         "desc":"only allowed if 8300.remittanceOrignatorIDCode is not in (SWBB,DPOB)"
+         "desc":"only allowed if 8300.remittanceOrignatorIDCode is not in (SWBB,DPOB)",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":6,
@@ -2277,7 +2282,8 @@
          "delimiter":"*",
          "mandatory":2,
          "value":"",
-         "desc":"only allowed if 8300.remittanceOrignatorIDCode = DPOB"
+         "desc":"only allowed if 8300.remittanceOrignatorIDCode = DPOB",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":7,
@@ -2286,7 +2292,8 @@
          "delimiter":"",
          "mandatory":0,
          "value":["ADDR","BIZZ","DLVY","HOME","MLTO","PBOX"],
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":8,
@@ -2295,7 +2302,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":9,
@@ -2304,7 +2312,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":10,
@@ -2313,7 +2322,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":11,
@@ -2322,7 +2332,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":12,
@@ -2331,7 +2342,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":13,
@@ -2340,7 +2352,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":14,
@@ -2349,7 +2362,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":15,
@@ -2358,7 +2372,8 @@
          "delimiter":"",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":16,
@@ -2367,7 +2382,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":17,
@@ -2376,7 +2392,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":18,
@@ -2385,7 +2402,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":19,
@@ -2394,7 +2412,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":20,
@@ -2403,7 +2422,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":21,
@@ -2412,7 +2432,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":22,
@@ -2421,7 +2442,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":23,
@@ -2430,7 +2452,8 @@
          "delimiter":"",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":24,
@@ -2439,7 +2462,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":25,
@@ -2448,7 +2472,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":26,
@@ -2457,7 +2482,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":27,
@@ -2466,7 +2492,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":28,
@@ -2475,7 +2502,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":29,
@@ -2484,7 +2512,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       }
    ]
   },
@@ -2498,7 +2527,8 @@
          "delimiter":"*",
          "mandatory":1,
          "value":"",
-         "desc":"mandatory if 3600.businessFunctionCode = CTP AND 3610.localInstrumentCode = RMTS"
+         "desc":"mandatory if 3600.businessFunctionCode = CTP AND 3610.localInstrumentCode = RMTS",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":2,
@@ -2507,7 +2537,8 @@
          "delimiter":"",
          "mandatory":0,
          "value":["OI","PI"],
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":3,
@@ -2516,7 +2547,8 @@
          "delimiter":"",
          "mandatory":0,
          "value":["BANK","CUST","DUNS","EMPL","GS1G","PROP","SWBB","TXID","ARNU","CCPT","CUST","DPOB","DRLC","EMPL","NIDN","PROP","SOSE","TXID"],
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":4,
@@ -2525,7 +2557,8 @@
          "delimiter":"*",
          "mandatory":2,
          "value":"",
-         "desc":"only allowed if 8350.remittanceBeneficiaryIDType And 8350.remittanceBeneficiaryIDCode are present; only allowed if 8350.remittanceBeneficiaryIDCode != DPOB"
+         "desc":"only allowed if 8350.remittanceBeneficiaryIDType And 8350.remittanceBeneficiaryIDCode are present; only allowed if 8350.remittanceBeneficiaryIDCode != DPOB",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":5,
@@ -2534,7 +2567,8 @@
          "delimiter":"*",
          "mandatory":2,
          "value":"",
-         "desc":"only allowed if 8350.remittanceBeneficiaryIDType And 8350.remittanceBeneficiaryIDCode are present; only allowed if 8350.remittanceBeneficiaryIDCode is not in (SWBB,DPOB)"
+         "desc":"only allowed if 8350.remittanceBeneficiaryIDType And 8350.remittanceBeneficiaryIDCode are present; only allowed if 8350.remittanceBeneficiaryIDCode is not in (SWBB,DPOB)",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":6,
@@ -2543,7 +2577,8 @@
          "delimiter":"*",
          "mandatory":2,
          "value":"",
-         "desc":"only allowed if 8350.remittanceBeneficiaryIDCode = DPOB;"
+         "desc":"only allowed if 8350.remittanceBeneficiaryIDCode = DPOB;",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":7,
@@ -2552,7 +2587,8 @@
          "delimiter":"",
          "mandatory":0,
          "value":["ADDR","BIZZ","DLVY","HOME","MLTO","PBOX"],
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":8,
@@ -2561,7 +2597,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":9,
@@ -2570,7 +2607,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":10,
@@ -2579,7 +2617,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":11,
@@ -2588,7 +2627,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":12,
@@ -2597,7 +2637,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":13,
@@ -2606,7 +2647,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":14,
@@ -2615,7 +2657,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":15,
@@ -2624,7 +2667,8 @@
          "delimiter":"",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":16,
@@ -2633,7 +2677,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":17,
@@ -2642,7 +2687,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":18,
@@ -2651,7 +2697,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":19,
@@ -2660,7 +2707,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":20,
@@ -2669,7 +2717,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":21,
@@ -2678,7 +2727,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":22,
@@ -2687,7 +2737,8 @@
          "delimiter":"*",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       },
       {
          "ordinal":23,
@@ -2696,7 +2747,8 @@
          "delimiter":"",
          "mandatory":0,
          "value":"",
-         "desc":""
+         "desc":"",
+         "section":"wireRemittance_by_wireID"
       }
    ]
   },
