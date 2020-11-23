@@ -2763,7 +2763,7 @@
          "mandatory":1,
          "value":["AROI","BOLD","CINV","CMCN","CNFA","CREN","DEBN","DISP","DNFA","HIRI","MSIN","PROP","PUOR","SBIN","SOAC","TSUT","VCHR"],
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       },
       {
          "ordinal":2,
@@ -2773,7 +2773,7 @@
          "mandatory":0,
          "value":"",
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       },
       {
          "ordinal":3,
@@ -2783,7 +2783,7 @@
          "mandatory":1,
          "value":"",
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       },
       {
          "ordinal":4,
@@ -2793,7 +2793,7 @@
          "mandatory":0,
          "value":"",
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       }
    ]
   },
@@ -2808,7 +2808,7 @@
          "mandatory":1,
          "value":"",
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       },
       {
          "ordinal":2,
@@ -2818,7 +2818,7 @@
          "mandatory":1,
          "value":"",
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       }
    ]
   },
@@ -2833,7 +2833,7 @@
          "mandatory":0,
          "value":"",
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       },
       {
          "ordinal":2,
@@ -2843,7 +2843,7 @@
          "mandatory":0,
          "value":"",
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       }
    ]
   },
@@ -2858,7 +2858,7 @@
          "mandatory":0,
          "value":"",
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       },
       {
          "ordinal":2,
@@ -2868,7 +2868,7 @@
          "mandatory":0,
          "value":"",
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       }
    ]
   },
@@ -2883,7 +2883,7 @@
          "mandatory":1,
          "value":["01","03","04","05","06","07","11","12","59","75","81","CM"],
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       },
       {
          "ordinal":2,
@@ -2893,7 +2893,7 @@
          "mandatory":1,
          "value":["CRDT","DBIT"],
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       },
       {
          "ordinal":3,
@@ -2903,7 +2903,7 @@
          "mandatory":1,
          "value":"",
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       },
       {
          "ordinal":4,
@@ -2913,7 +2913,7 @@
          "mandatory":1,
          "value":"",
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       },
       {
          "ordinal":5,
@@ -2923,7 +2923,7 @@
          "mandatory":0,
          "value":"",
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       }
    ]
   },
@@ -2938,7 +2938,7 @@
          "mandatory":0,
          "value":"",
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       }
    ]
   },
@@ -2953,7 +2953,7 @@
          "mandatory":1,
          "value":["AROI","DISP","FXDR","PROP","PUOR","RADM","RPIN","SCOR","VCHR"],
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       },
       {
          "ordinal":2,
@@ -2963,7 +2963,7 @@
          "mandatory":0,
          "value":"",
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       },
       {
          "ordinal":3,
@@ -2973,7 +2973,7 @@
          "mandatory":1,
          "value":"",
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       },
       {
          "ordinal":4,
@@ -2983,7 +2983,7 @@
          "mandatory":0,
          "value":"",
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       }
    ]
   },
@@ -2998,7 +2998,7 @@
          "mandatory":0,
          "value":"",
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       },
       {
          "ordinal":2,
@@ -3008,7 +3008,7 @@
          "mandatory":0,
          "value":"",
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       },
       {
          "ordinal":3,
@@ -3018,7 +3018,7 @@
          "mandatory":0,
          "value":"",
          "desc":"",
-         "section":"WireDoc_By_WireID"
+         "section":"wireRemittanceDoc_by_wireRemittanceID"
       }
    ]
   },
