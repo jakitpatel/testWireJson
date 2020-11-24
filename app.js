@@ -1769,6 +1769,113 @@ function verify8550(tag, elementArr, wire) {
     return errTag;
 }
 
+function verify8600(tag, elementArr, wire) {
+    /*{8600} Adjustment Information
+        Adjustment Reason Code (2 character code)
+        01 Pricing Error
+        03 Extension Error
+        04 Item Not Accepted (Damaged)
+        05 Item Not Accepted (Quality)
+        06 Quantity Contested
+        07 Incorrect Product
+        11 Returns (Damaged)
+        12 Returns (Quality)
+        59 Item Not Received
+        75 Total Order Not Received
+        81 Credit as Agreed
+        CM Covered by Credit Memo
+        b Credit Debit Indicator (‘CRDT’ credit or ‘DBIT’ debit)
+        Currency Code (3 characters)
+        Amount (19 characters) See tag {8450} for proper format.
+        Additional Information (140 characters)
+        {3600} must be CTP and {3610} must be RMTS; otherwise not permitted.
+        Adjustment Reason, Credit Debit Indicator, Currency Code and Amount are mandatory.
+        */
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    let remittanceArr = wire['wireRemittance_by_wireID'];
+    if(remittanceArr && remittanceArr.length>0){
+        let remittanceObj = remittanceArr[0];
+        let remDocArr = remittanceObj['wireRemittanceDoc_by_wireRemittanceID'];
+        if(remDocArr && remDocArr.length>0){
+            for(var k = 0; k < remDocArr.length; k++) {
+                let remDocObj = remDocArr[k];
+                let wireDocID = remDocObj['wireDocID'];
+                let adjustmentReason = remDocObj['adjustmentReason'];
+                let creditDebit = remDocObj['creditDebit'];
+                let adjustmentCurrency = remDocObj['adjustmentCurrency'];
+                let adjustmentAmount = remDocObj['adjustmentAmount'];
+
+                for(var j = 0; j < elementArr.length; j++) {
+                    let objElement = elementArr[j];
+                    let val = remDocObj[objElement.name];
+                    if(busFunCode !== "CTP" && localInstrumentCode !== "RMTS"){
+                        if(isExist(val)){
+                            errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = RMTS; ";
+                        }
+                    }
+                    if(busFunCode == "CTP" && localInstrumentCode == "RMTS"){
+                        if(objElement.name == "adjustmentReason" || objElement.name == "creditDebit" || objElement.name == "adjustmentCurrency" || objElement.name == "adjustmentAmount"){
+                            errTag = errTag + checkMandatory(tag, objElement, val, wireDocID);
+                            if(objElement.name == "adjustmentAmount"){
+                                let numeric = /^[0-9][0-9.]*$/;
+                                if(isExist(val)){
+                                    if(!val.match(numeric)) {
+                                        errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" : only allowed [0-9][0-9.]*; ";
+                                    }
+                                }
+                            } 
+                        } else {  
+                            errTag = errTag + checkOptional(tag, objElement, val, wireDocID);
+                        }            
+                    } else {
+                        errTag = errTag + checkOptional(tag, objElement, val, wireDocID);
+                    }
+                }
+            }
+        }
+    }
+    return errTag;
+}
+
+function verify8650(tag, elementArr, wire) {
+    /*{8650} Date of Remittance Document (CCYYMMDD format)
+        {3600} must be CTP and {3610} must be RMTS; otherwise not permitted
+    */
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    let remittanceArr = wire['wireRemittance_by_wireID'];
+    if(remittanceArr && remittanceArr.length>0){
+        let remittanceObj = remittanceArr[0];
+        let remDocArr = remittanceObj['wireRemittanceDoc_by_wireRemittanceID'];
+        if(remDocArr && remDocArr.length>0){
+            for(var k = 0; k < remDocArr.length; k++) {
+                let remDocObj = remDocArr[k];
+                let wireDocID = remDocObj['wireDocID'];
+                let remitanceDate = remDocObj['remitanceDate'];
+
+                for(var j = 0; j < elementArr.length; j++) {
+                    let objElement = elementArr[j];
+                    let val = remDocObj[objElement.name];
+                    if(busFunCode !== "CTP" && localInstrumentCode !== "RMTS"){
+                        if(isExist(val)){
+                            errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = RMTS; ";
+                        }
+                    }
+                    if(busFunCode == "CTP" && localInstrumentCode == "RMTS"){
+                        errTag = errTag + checkOptional(tag, objElement, val, wireDocID);         
+                    } else {
+                        errTag = errTag + checkOptional(tag, objElement, val, wireDocID);
+                    }
+                }
+            }
+        }
+    }
+    return errTag;
+}
+
 function verify9000(tag, elementArr, wire) {
     /*{9000} : Service Message Information
         Line 1 to 12 (35 characters each)
