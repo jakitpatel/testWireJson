@@ -1595,34 +1595,17 @@ function verify8400(tag, elementArr, wire) {
                         if(objElement.name == "primaryDocumentTypeCode" || objElement.name == "primaryDocumentID"){
                             errTag = errTag + checkMandatory(tag, objElement, val, wireDocID);
                         } else if(objElement.name == "primaryDocumentProprietary"){
-                            if(isExist(remittanceBeneficiaryIDNumber)){
-                                if(remittanceBeneficiaryIDType=="" || remittanceBeneficiaryIDType==null || remittanceBeneficiaryIDCode=="" || remittanceBeneficiaryIDCode==null){
-                                    errTag = errTag + tag+ ": "+objElement.name+" is not permitted unless Identification Type and Identification Code are present; ";
-                                }
-                            }
-                            if(isExist(primaryDocumentTypeCode) && primaryDocumentTypeCode !== "PROP"){
+                            if(isExist(primaryDocumentProprietary) && primaryDocumentTypeCode !== "PROP"){
                                 errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" is not permitted for Document Type Code other than PROP; ";
                             }
-                        }  else if(objElement.name == "remittanceBeneficiaryIDIssuer"){
-                            if(typeof remittanceBeneficiaryIDIssuer !== 'undefined' && remittanceBeneficiaryIDIssuer !== null && remittanceBeneficiaryIDIssuer !== ""){
-                                if(remittanceBeneficiaryIDType=="" || remittanceBeneficiaryIDType==null || remittanceBeneficiaryIDCode=="" || remittanceBeneficiaryIDCode==null || remittanceBeneficiaryIDNumber=="" || remittanceBeneficiaryIDNumber==null){
-                                    errTag = errTag + tag+ ": "+objElement.name+" is Not permitted unless Identification Type, Identification Code and Identification Number are present; ";
-                                }
-                            }
-                            if(typeof remittanceBeneficiaryIDIssuer !== 'undefined' && remittanceBeneficiaryIDIssuer !== null && remittanceBeneficiaryIDIssuer !== "" && (remittanceBeneficiaryIDCode == "DPOB" || remittanceBeneficiaryIDCode == "SWBB")){
-                                errTag = errTag + tag+ ": "+objElement.name+" is not permitted for Identification Code SWBB and DPOB; ";
-                            }
-                        } else if(objElement.name == "remittanceBeneficiaryDatePlaceBirth"){
-                            if(typeof remittanceBeneficiaryDatePlaceBirth !== 'undefined' && remittanceBeneficiaryDatePlaceBirth !== null && remittanceBeneficiaryDatePlaceBirth !== "" && remittanceBeneficiaryIDCode !== "DPOB"){
-                                errTag = errTag + tag+ ": "+objElement.name+" is only permitted for Identification Code DPOB; ";
-                            } else {
-                                errTag = errTag + checkOptional(tag, objElement, val);
-                            }
+                            if(primaryDocumentTypeCode === "PROP"){
+                                errTag = errTag + checkMandatory(tag, objElement, val, wireDocID);
+                            } 
                         } else {  
-                            errTag = errTag + checkOptional(tag, objElement, val);
+                            errTag = errTag + checkOptional(tag, objElement, val, wireDocID);
                         }            
                     } else {
-                        errTag = errTag + checkOptional(tag, objElement, val);
+                        errTag = errTag + checkOptional(tag, objElement, val, wireDocID);
                     }
                 }
             }
