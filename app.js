@@ -1579,9 +1579,6 @@ function verify8400(tag, elementArr, wire) {
                 let remDocObj = remDocArr[k];
                 let wireDocID = remDocObj['wireDocID'];
                 let primaryDocumentTypeCode = remDocObj['primaryDocumentTypeCode'];
-                let primaryDocumentProprietary = remDocObj['primaryDocumentProprietary'];
-                let primaryDocumentID = remDocObj['primaryDocumentID'];
-                let primaryDocumentIssuer = remDocObj['primaryDocumentIssuer'];
 
                 for(var j = 0; j < elementArr.length; j++) {
                     let objElement = elementArr[j];
@@ -1595,7 +1592,7 @@ function verify8400(tag, elementArr, wire) {
                         if(objElement.name == "primaryDocumentTypeCode" || objElement.name == "primaryDocumentID"){
                             errTag = errTag + checkMandatory(tag, objElement, val, wireDocID);
                         } else if(objElement.name == "primaryDocumentProprietary"){
-                            if(isExist(primaryDocumentProprietary) && primaryDocumentTypeCode !== "PROP"){
+                            if(isExist(val) && primaryDocumentTypeCode !== "PROP"){
                                 errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" is not permitted for Document Type Code other than PROP; ";
                             }
                             if(primaryDocumentTypeCode === "PROP"){
@@ -1653,7 +1650,8 @@ function verify8450(tag, elementArr, wire) {
                             if(objElement.name === "actualPaidAmount"){
                                 let numeric = /^[0-9][0-9.]*$/;
                                 if(isExist(val)){
-                                    if(!val.match(numeric)) {
+                                    //val = val.toString();
+                                    if(!val.toString().match(numeric)) {
                                         errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" : only allowed [0-9][0-9.]*; ";
                                     }
                                 }
@@ -1703,7 +1701,7 @@ function verify8500(tag, elementArr, wire) {
                         if(objElement.name == "grossAmountAmount"){
                             let numeric = /^[0-9][0-9.]*$/;
                             if(isExist(val)){
-                                if(!val.match(numeric)) {
+                                if(!val.toString().match(numeric)) {
                                     errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" : only allowed [0-9][0-9.]*; ";
                                 }
                             }
@@ -1752,7 +1750,7 @@ function verify8550(tag, elementArr, wire) {
                         if(objElement.name == "discountAmount"){
                             let numeric = /^[0-9][0-9.]*$/;
                             if(isExist(val)){
-                                if(!val.match(numeric)) {
+                                if(!val.toString().match(numeric)) {
                                     errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" : only allowed [0-9][0-9.]*; ";
                                 }
                             }
@@ -1821,7 +1819,7 @@ function verify8600(tag, elementArr, wire) {
                             if(objElement.name == "adjustmentAmount"){
                                 let numeric = /^[0-9][0-9.]*$/;
                                 if(isExist(val)){
-                                    if(!val.match(numeric)) {
+                                    if(!val.toString().match(numeric)) {
                                         errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" : only allowed [0-9][0-9.]*; ";
                                     }
                                 }
@@ -1856,6 +1854,103 @@ function verify8650(tag, elementArr, wire) {
                 let wireDocID = remDocObj['wireDocID'];
                 let remitanceDate = remDocObj['remitanceDate'];
 
+                for(var j = 0; j < elementArr.length; j++) {
+                    let objElement = elementArr[j];
+                    let val = remDocObj[objElement.name];
+                    if(busFunCode !== "CTP" && localInstrumentCode !== "RMTS"){
+                        if(isExist(val)){
+                            errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = RMTS; ";
+                        }
+                    }
+                    if(busFunCode == "CTP" && localInstrumentCode == "RMTS"){
+                        errTag = errTag + checkOptional(tag, objElement, val, wireDocID);         
+                    } else {
+                        errTag = errTag + checkOptional(tag, objElement, val, wireDocID);
+                    }
+                }
+            }
+        }
+    }
+    return errTag;
+}
+
+function verify8700(tag, elementArr, wire) {
+    /*{8700} Secondary Remittance Document Information
+        Document Type Code (4 character code)
+        AROI Accounts Receivable Open Item
+        DISP Dispatch Advice
+        FXDR Foreign Exchange Deal Reference
+        PROP Proprietary Document Type
+        PUOR Purchase Order
+        RADM Remittance Advice Message
+        RPIN Related Payment Instruction
+        SCOR Structured Communication Reference
+        VCHR Voucher
+        Proprietary Document Type Code (35 characters)
+        Document Identification Number (35 characters)
+        Issuer (35 characters)
+        Must be present if {3600} is CTP and {3610} is RMTS; otherwise not permitted.
+        Document Type Code and Document Identification Number are mandatory for each set of remittance data.
+        Proprietary Document Type Code is mandatory for Document Type Code PROP; otherwise not permitted.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    let remittanceArr = wire['wireRemittance_by_wireID'];
+    if(remittanceArr && remittanceArr.length>0){
+        let remittanceObj = remittanceArr[0];
+        let remDocArr = remittanceObj['wireRemittanceDoc_by_wireRemittanceID'];
+        if(remDocArr && remDocArr.length>0){
+            for(var k = 0; k < remDocArr.length; k++) {
+                let remDocObj = remDocArr[k];
+                let wireDocID = remDocObj['wireDocID'];
+                let secondaryDocumentTypeCode = remDocObj['secondaryDocumentTypeCode'];
+
+                for(var j = 0; j < elementArr.length; j++) {
+                    let objElement = elementArr[j];
+                    let val = remDocObj[objElement.name];
+                    if(busFunCode !== "CTP" && localInstrumentCode !== "RMTS"){
+                        if(isExist(val)){
+                            errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = RMTS; ";
+                        }
+                    }
+                    if(busFunCode == "CTP" && localInstrumentCode == "RMTS"){
+                        if(objElement.name == "secondaryDocumentTypeCode" || objElement.name == "secondaryDocumentID"){
+                            errTag = errTag + checkMandatory(tag, objElement, val, wireDocID);
+                        } else if(objElement.name == "secondaryDocumentProprietary"){
+                            if(isExist(val) && secondaryDocumentTypeCode !== "PROP"){
+                                errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" is not permitted for Document Type Code other than PROP; ";
+                            }
+                            if(secondaryDocumentTypeCode === "PROP"){
+                                errTag = errTag + checkMandatory(tag, objElement, val, wireDocID);
+                            } 
+                        } else {  
+                            errTag = errTag + checkOptional(tag, objElement, val, wireDocID);
+                        }            
+                    } else {
+                        errTag = errTag + checkOptional(tag, objElement, val, wireDocID);
+                    }
+                }
+            }
+        }
+    }
+    return errTag;
+}
+
+function verify8750(tag, elementArr, wire) {
+    /*{8750} Remittance Free Text Line 1 to 3 (140 characters each)
+        {3600} must be CTP and {3610} must be RMTS; otherwise not permitted
+    */
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    let remittanceArr = wire['wireRemittance_by_wireID'];
+    if(remittanceArr && remittanceArr.length>0){
+        let remittanceObj = remittanceArr[0];
+        let remDocArr = remittanceObj['wireRemittanceDoc_by_wireRemittanceID'];
+        if(remDocArr && remDocArr.length>0){
+            for(var k = 0; k < remDocArr.length; k++) {
+                let remDocObj = remDocArr[k];
+                let wireDocID = remDocObj['wireDocID'];
                 for(var j = 0; j < elementArr.length; j++) {
                     let objElement = elementArr[j];
                     let val = remDocObj[objElement.name];
@@ -2107,6 +2202,30 @@ function verifytag(tag, elementArr, wire){
             break;
         case 8350:
             errTag = verify8350(tag, elementArr, wire);
+            break;
+        case 8400:
+            errTag = verify8400(tag, elementArr, wire);
+            break;
+        case 8450:
+            errTag = verify8450(tag, elementArr, wire);
+            break;
+        case 8500:
+            errTag = verify8500(tag, elementArr, wire);
+            break;
+        case 8550:
+            errTag = verify8550(tag, elementArr, wire);
+            break;
+        case 8600:
+            errTag = verify8600(tag, elementArr, wire);
+            break;
+        case 8650:
+            errTag = verify8650(tag, elementArr, wire);
+            break;
+        case 8700:
+            errTag = verify8700(tag, elementArr, wire);
+            break;
+        case 8750:
+            errTag = verify8750(tag, elementArr, wire);
             break;
         case 9000:
             errTag = verify9000(tag, elementArr, wire);
