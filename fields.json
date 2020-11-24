@@ -26,7 +26,7 @@
          "name":"senderInfoTestProdCode",
          "delimiter":"",
          "mandatory":1,
-         "value":["T","P"],
+         "value":"T|P",
          "desc":""
       },
       {
@@ -35,7 +35,7 @@
          "name":"senderInfoDupCode",
          "delimiter":"",
          "mandatory":1,
-         "value":["","P"],
+         "value":" |P",
          "desc":""
       }
    ]
@@ -164,7 +164,7 @@
          "name":"businessFunctionCode",
          "delimiter":"",
          "mandatory":1,
-         "value":["BTR","CKS","CTP","CTR","DEP","DRB","DRC","DRW","FFR","FFS","SVC"],
+         "value":"BTR|CKS|CTP|CTR|DEP|DRB|DRC|DRW|FFR|FFS|SVC",
          "desc":""
       },
       {
@@ -215,7 +215,7 @@
          "name":"localInstrumentCode",
          "delimiter":"",
          "mandatory":0,
-         "value":["ANSI","COVS","GXML","IXML","NARR","PROP","RMTS","RRMT","S820","SWIF","UEDI"],
+         "value":"ANSI|COVS|GXML|IXML|NARR|PROP|RMTS|RRMT|S820|SWIF|UEDI",
          "desc":"only allowed if 3600.businessFunctionCode = CTP"
       },
       {
@@ -306,7 +306,7 @@
          "name":"detailsOfCharges",
          "delimiter":"",
          "mandatory":0,
-         "value":["B","S"],
+         "value":"B|S",
          "desc":"only allowed if 3600.businessFunctionCode in (CTP, CTR)"
       },
       {
@@ -429,7 +429,7 @@
          "name":"intermediaryFICode",
          "delimiter":"",
          "mandatory":2,
-         "value":["B","C","D","F","U"],
+         "value":"B|C|D|F|U",
          "desc":"If present then 4100 & 4200 are mandatory; mandatory if 4000.intermediaryFIIdentifier is present"
       },
       {
@@ -488,7 +488,7 @@
          "name":"beneficiaryFICode",
          "delimiter":"",
          "mandatory":2,
-         "value":["B","C","D","F","U"],
+         "value":"B|C|D|F|U",
          "desc":"If present then 4200 is mandatory; mandatory if 4100.beneficiaryFIIdentifier is present"
       },
       {
@@ -547,7 +547,7 @@
          "name":"beneficiaryCode",
          "delimiter":"",
          "mandatory":2,
-         "value":["B","C","D","F","T","U","1","2","3","4","5","9"],
+         "value":"B|C|D|F|T|U|1|2|3|4|5|9",
          "desc":"mandatory if 3600.businessFunctionCode is in (CTR,CTP,DRW or DRC); mandatory if 4200.beneficiaryIdentifier is present; If 4200.beneficiaryCode = T then 3600.businessFunctionCode must be (CTP, CTR)"
       },
       {
@@ -620,7 +620,7 @@
          "name":"accountDebitedCode",
          "delimiter":"",
          "mandatory":2,
-         "value":["D"],
+         "value":"D",
          "desc":"mandatory if 3600.businessFunctionCode in (DRB,DRC,DRW,SVC); If present then 4400.accountDebitedIdentifier AND 4400.accountDebitedName are required"
       },
       {
@@ -679,7 +679,7 @@
          "name":"originatorCode",
          "delimiter":"",
          "mandatory":2,
-         "value":["B","C","D","F","T","U","1","2","3","4","5","9"],
+         "value":"B|C|D|F|T|U|1|2|3|4||9",
          "desc":"mandatory if 3600.businessFunctionCode is in (CTP,CTR) and 5010 is not present; mandatory if 5000.originatorIdentifier is present; If 5000.originatorCode = T then 3600.businessFunctionCode must be (CTP, CTR)"
       },
       {
@@ -738,7 +738,7 @@
          "name":"partyIDUniqeIDType",
          "delimiter":"",
          "mandatory":2,
-         "value":["ARNU/","CCPT/","CUST/","DRLC/","EMPL/","NIDN/","SOSE/","TXID/"],
+         "value":"ARNU|CCPT|CUST|DRLC|EMPL|NIDN|SOSE|TXID",
          "desc":"mandatory if 3600.businessFunctionCode = CTP AND 5000 is not present"
       },
       {
@@ -824,7 +824,7 @@
          "name":"originatorFICode",
          "delimiter":"",
          "mandatory":2,
-         "value":["B","C","D","F","U"],
+         "value":"B|C|D|F|U",
          "desc":"if present, 5000.originatorCode is mandatory; if present & 3600.businessFunctionCode = CTP, 5010 is mandatory; mandatory if 5100.originatorFIIdentifier is present"
       },
       {
@@ -883,7 +883,7 @@
          "name":"instructingFICode",
          "delimiter":"",
          "mandatory":2,
-         "value":["B","C","D","F","U"],
+         "value":"B|C|D|F|U",
          "desc":"if present, 5000.originatorCode is mandatory; if present & 3600.businessFunctionCode = CTP, 5010 is mandatory; mandatory if 5200.instructingFIIdentifier is present"
       },
       {
@@ -1056,7 +1056,7 @@
          "name":"drawdownDebitAcctCode",
          "delimiter":"",
          "mandatory":0,
-         "value":["LTR","PHN","TLX","WRE"],
+         "value":"LTR|PHN|TLX|WRE",
          "desc":"only allowed if 3600.businessFunctionCode is in (DRB,DRC,DRW,SVC)"
       },
       {
@@ -1183,7 +1183,7 @@
          "name":"intermediaryFIAdviceCode",
          "delimiter":"",
          "mandatory":0,
-         "value":["LTR","PHN","TLX","WRE"],
+         "value":"LTR|PHN|TLX|WRE",
          "desc":"If present then 4000, 4100 AND 4200 required"
       },
       {
@@ -1310,7 +1310,7 @@
          "name":"beneficiaryFIAdviceCode",
          "delimiter":"",
          "mandatory":0,
-         "value":["LTR","PHN","TLX","WRE"],
+         "value":"LTR|PHN|TLX|WRE",
          "desc":"If present then 4100 AND 4200 required"
       },
       {
@@ -1437,7 +1437,7 @@
          "name":"beneficiaryAdviceCode",
          "delimiter":"",
          "mandatory":0,
-         "value":["LTR","PHN","TLX","WRE","HLD"],
+         "value":"LTR|PHN|TLX|WRE|HLD",
          "desc":"If present then 4200 required"
       },
       {
@@ -1505,7 +1505,7 @@
          "name":"methodOfPayment",
          "delimiter":"*",
          "mandatory":0,
-         "value":["CHECK"],
+         "value":"CHECK",
          "desc":"If present then 6410 AND 4200 required"
       },
       {
@@ -2055,7 +2055,7 @@
          "name":"relatedRemittanceMethod",
          "delimiter":"",
          "mandatory":0,
-         "value":["EDIC","EMAL","FAXI","POST","SMSM","URID"],
+         "value":"EDIC|EMAL|FAXI|POST|SMSM|URID",
          "desc":""
       },
       {
@@ -2082,7 +2082,7 @@
          "name":"relatedRemittanceAddressType",
          "delimiter":"",
          "mandatory":0,
-         "value":["ADDR","BIZZ","DLVY","HOME","MLTO","PBOX"],
+         "value":"ADDR|BIZZ|DLVY|HOME|MLTO|PBOX",
          "desc":""
       },
       {
@@ -2231,7 +2231,7 @@
          "name":"remittanceOrignatorIDType",
          "delimiter":"",
          "mandatory":1,
-         "value":["OI","PI"],
+         "value":"OI|PI",
          "desc":"mandatory if 3600.businessFunctionCode = CTP AND 3610.localInstrumentCode = RMTS",
          "section":"wireRemittance_by_wireID"
       },
@@ -2241,7 +2241,7 @@
          "name":"remittanceOrignatorIDCode",
          "delimiter":"",
          "mandatory":1,
-         "value":["BANK","CUST","DUNS","EMPL","GS1G","PROP","SWBB","TXID","ARNU","CCPT","CUST","DPOB","DRLC","EMPL","NIDN","PROP","SOSE","TXID"],
+         "value":"BANK|CUST|DUNS|EMPL|GS1G|PROP|SWBB|TXID|ARNU|CCPT|CUST|DPOB|DRLC|EMPL|NIDN|PROP|SOSE|TXID",
          "desc":"",
          "section":"wireRemittance_by_wireID"
       },
@@ -2291,7 +2291,7 @@
          "name":"remittanceOrignatorAddressType",
          "delimiter":"",
          "mandatory":0,
-         "value":["ADDR","BIZZ","DLVY","HOME","MLTO","PBOX"],
+         "value":"ADDR|BIZZ|DLVY|HOME|MLTO|PBOX",
          "desc":"",
          "section":"wireRemittance_by_wireID"
       },
@@ -2536,7 +2536,7 @@
          "name":"remittanceBeneficiaryIDType",
          "delimiter":"",
          "mandatory":0,
-         "value":["OI","PI"],
+         "value":"OI|PI",
          "desc":"",
          "section":"wireRemittance_by_wireID"
       },
@@ -2546,7 +2546,7 @@
          "name":"remittanceBeneficiaryIDCode",
          "delimiter":"",
          "mandatory":0,
-         "value":["BANK","CUST","DUNS","EMPL","GS1G","PROP","SWBB","TXID","ARNU","CCPT","CUST","DPOB","DRLC","EMPL","NIDN","PROP","SOSE","TXID"],
+         "value":"BANK|CUST|DUNS|EMPL|GS1G|PROP|SWBB|TXID|ARNU|CCPT|CUST|DPOB|DRLC|EMPL|NIDN|PROP|SOSE|TXID",
          "desc":"",
          "section":"wireRemittance_by_wireID"
       },
@@ -2586,7 +2586,7 @@
          "name":"remittanceBeneficiaryAddressType",
          "delimiter":"",
          "mandatory":0,
-         "value":["ADDR","BIZZ","DLVY","HOME","MLTO","PBOX"],
+         "value":"ADDR|BIZZ|DLVY|HOME|MLTO|PBOX",
          "desc":"",
          "section":"wireRemittance_by_wireID"
       },
@@ -2761,7 +2761,7 @@
          "name":"primaryDocumentTypeCode",
          "delimiter":"",
          "mandatory":1,
-         "value":["AROI","BOLD","CINV","CMCN","CNFA","CREN","DEBN","DISP","DNFA","HIRI","MSIN","PROP","PUOR","SBIN","SOAC","TSUT","VCHR"],
+         "value":"AROI|BOLD|CINV|CMCN|CNFA|CREN|DEBN|DISP|DNFA|HIRI|MSIN|PROP|PUOR|SBIN|SOAC|TSUT|VCHR",
          "desc":"",
          "section":"wireRemittanceDoc_by_wireRemittanceID"
       },
@@ -2881,7 +2881,7 @@
          "name":"adjustmentReason",
          "delimiter":"",
          "mandatory":1,
-         "value":["01","03","04","05","06","07","11","12","59","75","81","CM"],
+         "value":"01|03|04|05|06|07|11|12|59|75|81|CM",
          "desc":"",
          "section":"wireRemittanceDoc_by_wireRemittanceID"
       },
@@ -2891,7 +2891,7 @@
          "name":"creditDebit",
          "delimiter":"",
          "mandatory":1,
-         "value":["CRDT","DBIT"],
+         "value":"CRDT|DBIT",
          "desc":"",
          "section":"wireRemittanceDoc_by_wireRemittanceID"
       },
@@ -2951,7 +2951,7 @@
          "name":"secondaryDocumentTypeCode",
          "delimiter":"",
          "mandatory":1,
-         "value":["AROI","DISP","FXDR","PROP","PUOR","RADM","RPIN","SCOR","VCHR"],
+         "value":"AROI|DISP|FXDR|PROP|PUOR|RADM|RPIN|SCOR|VCHR",
          "desc":"",
          "section":"wireRemittanceDoc_by_wireRemittanceID"
       },
@@ -3153,7 +3153,7 @@
          "name":"messageDispositionTestProdCode",
          "delimiter":"",
          "mandatory":0,
-         "value":["T","P"],
+         "value":"T|P",
          "desc":""
       },
       {
@@ -3162,7 +3162,7 @@
          "name":"messageDispositionDupCode",
          "delimiter":"",
          "mandatory":0,
-         "value":["","R","P"],
+         "value":"|R|P",
          "desc":""
       },
       {
@@ -3171,7 +3171,7 @@
          "name":"messageDispositionStatus",
          "delimiter":"",
          "mandatory":0,
-         "value":["0","2","3","7","N","S"],
+         "value":"0|2|3|7|N|S",
          "desc":""
       }
    ]
@@ -3276,7 +3276,7 @@
          "name":"errorCategory",
          "delimiter":"",
          "mandatory":0,
-         "value":["E","F","X","H","W","I"],
+         "value":"E|F|X|H|W|I",
          "desc":""
       },
       {

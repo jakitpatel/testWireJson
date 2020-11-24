@@ -1541,6 +1541,96 @@ function verify8350(tag, elementArr, wire) {
     return errTag;
 }
 
+function verify8400(tag, elementArr, wire) {
+    /*{8400} Primary Remittance Document Information
+        Document Type Code (4 character code)
+        AROI Accounts Receivable Open Item
+        BOLD Bill of Lading Shipping Notice
+        CINV Commercial Invoice
+        CMCN Commercial Contract
+        CNFA Credit Note Related to Financial Adjustment
+        CREN Credit Note
+        DEBN Debit Note
+        DISP Dispatch Advice
+        DNFA Debit Note Related to Financial Adjustment
+        HIRI Hire Invoice
+        MSIN Metered Service Invoice
+        PROP Proprietary Document Type
+        PUOR Purchase Order
+        SBIN Self Billed Invoice
+        SOAC Statement of Account
+        TSUT Trade Services Utility Transaction
+        VCHR Voucher
+        Proprietary Document Type Code (35 characters)
+        Document Identification Number (35 characters)
+        Issuer (35 characters)
+        Must be present if {3600} is CTP and {3610} is RMTS; otherwise not permitted.
+        Document Type Code and Document Identification Number are mandatory for each set of remittance data.
+        Proprietary Document Type Code is mandatory for Document Type Code PROP; otherwise not permitted.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    let remittanceArr = wire['wireRemittance_by_wireID'];
+    if(remittanceArr && remittanceArr.length>0){
+        let remittanceObj = remittanceArr[0];
+        let remDocArr = remittanceObj['wireRemittanceDoc_by_wireRemittanceID'];
+        if(remDocArr && remDocArr.length>0){
+            for(var k = 0; k < remDocArr.length; k++) {
+                let remDocObj = remDocArr[k];
+                let wireDocID = remDocObj['wireDocID'];
+                let primaryDocumentTypeCode = remDocObj['primaryDocumentTypeCode'];
+                let primaryDocumentProprietary = remittanceObj['primaryDocumentProprietary'];
+                let primaryDocumentID = remittanceObj['primaryDocumentID'];
+                let primaryDocumentIssuer = remittanceObj['primaryDocumentIssuer'];
+
+                for(var j = 0; j < elementArr.length; j++) {
+                    let objElement = elementArr[j];
+                    let val = remDocObj[objElement.name];
+                    if(busFunCode !== "CTP" && localInstrumentCode !== "RMTS"){
+                        if(isExist(val)){
+                            errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = RMTS; ";
+                        }
+                    }
+                    if(busFunCode == "CTP" && localInstrumentCode == "RMTS"){
+                        if(objElement.name == "primaryDocumentTypeCode" || objElement.name == "primaryDocumentID"){
+                            errTag = errTag + checkMandatory(tag, objElement, val, wireDocID);
+                        } else if(objElement.name == "primaryDocumentProprietary"){
+                            if(isExist(remittanceBeneficiaryIDNumber)){
+                                if(remittanceBeneficiaryIDType=="" || remittanceBeneficiaryIDType==null || remittanceBeneficiaryIDCode=="" || remittanceBeneficiaryIDCode==null){
+                                    errTag = errTag + tag+ ": "+objElement.name+" is not permitted unless Identification Type and Identification Code are present; ";
+                                }
+                            }
+                            if(isExist(primaryDocumentTypeCode) && primaryDocumentTypeCode !== "PROP"){
+                                errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" is not permitted for Document Type Code other than PROP; ";
+                            }
+                        }  else if(objElement.name == "remittanceBeneficiaryIDIssuer"){
+                            if(typeof remittanceBeneficiaryIDIssuer !== 'undefined' && remittanceBeneficiaryIDIssuer !== null && remittanceBeneficiaryIDIssuer !== ""){
+                                if(remittanceBeneficiaryIDType=="" || remittanceBeneficiaryIDType==null || remittanceBeneficiaryIDCode=="" || remittanceBeneficiaryIDCode==null || remittanceBeneficiaryIDNumber=="" || remittanceBeneficiaryIDNumber==null){
+                                    errTag = errTag + tag+ ": "+objElement.name+" is Not permitted unless Identification Type, Identification Code and Identification Number are present; ";
+                                }
+                            }
+                            if(typeof remittanceBeneficiaryIDIssuer !== 'undefined' && remittanceBeneficiaryIDIssuer !== null && remittanceBeneficiaryIDIssuer !== "" && (remittanceBeneficiaryIDCode == "DPOB" || remittanceBeneficiaryIDCode == "SWBB")){
+                                errTag = errTag + tag+ ": "+objElement.name+" is not permitted for Identification Code SWBB and DPOB; ";
+                            }
+                        } else if(objElement.name == "remittanceBeneficiaryDatePlaceBirth"){
+                            if(typeof remittanceBeneficiaryDatePlaceBirth !== 'undefined' && remittanceBeneficiaryDatePlaceBirth !== null && remittanceBeneficiaryDatePlaceBirth !== "" && remittanceBeneficiaryIDCode !== "DPOB"){
+                                errTag = errTag + tag+ ": "+objElement.name+" is only permitted for Identification Code DPOB; ";
+                            } else {
+                                errTag = errTag + checkOptional(tag, objElement, val);
+                            }
+                        } else {  
+                            errTag = errTag + checkOptional(tag, objElement, val);
+                        }            
+                    } else {
+                        errTag = errTag + checkOptional(tag, objElement, val);
+                    }
+                }
+            }
+        }
+    }
+    return errTag;
+}
+
 function verify9000(tag, elementArr, wire) {
     /*{9000} : Service Message Information
         Line 1 to 12 (35 characters each)
@@ -1799,13 +1889,17 @@ function verifytag(tag, elementArr, wire){
 console.log("Error:" + errorMsg);
 //console.log("\n");
 
-function checkMandatory(tag, objElement, val){
+function checkMandatory(tag, objElement, val, remDocID=null){
     //console.log("checkMandatory: tag =" + tag + " objElement=" + JSON.stringify(objElement) + " val=" + val);
 
     let err = "";
    
     if( typeof val == 'undefined' || val === null || val === ""){
-            err = tag+":"+objElement.name+": value is mandatory;";
+            if(remDocID!==null){
+                err = tag+":"+remDocID+" : "+objElement.name+": value is mandatory;";
+            } else {
+                err = tag+":"+objElement.name+": value is mandatory;";
+            }
     }
     // check if val exist in value array
     //
@@ -1813,27 +1907,112 @@ function checkMandatory(tag, objElement, val){
         var n = objElement.value.includes(val);
         //console.log("checkMandatory exist : " + n);
         if(n === false){
-            err = tag+":"+objElement.name+": value " + val + " not in " + objElement.value.toString()+";";
+            if(remDocID!==null){
+                err = tag+":"+remDocID+" : "+objElement.name+": value " + val + " not in " + objElement.value.toString()+";";
+            } else {
+                err = tag+":"+objElement.name+": value " + val + " not in " + objElement.value.toString()+";";
+            }
         }
     } else if(objElement.length !== null && val.length > objElement.length){
         // check if length equals to value
-        err = tag+":"+objElement.name+": value too long;";
+        if(remDocID!==null){
+            err = tag+":"+remDocID+" : "+objElement.name+": value too long;";
+        } else {
+            err = tag+":"+objElement.name+": value too long;";
+        }
     }
     
     return err;
 }
 
-function checkOptional(tag, objElement, val){
+function checkOptional(tag, objElement, val, remDocID=null){
     let err = "";
     if(typeof val !== 'undefined'){
         if(val !== null && val.length > objElement.length){
-            err = tag+":"+objElement.name+": value too long;";
+            if(remDocID!==null){
+                err = tag+":"+remDocID+":"+objElement.name+": value too long;";
+            } else {
+                err = tag+":"+objElement.name+": value too long;";
+            }
         }
         if(val !== null && objElement.value !== ""){
             var n = objElement.value.includes(val);
             //console.log("checkMandatory exist : " + n);
             if(n === false){
-                err = tag+":"+objElement.name+": value " + val + " not in " + objElement.value.toString()+";";
+                if(remDocID!==null){
+                    err = tag+":"+remDocID+":"+objElement.name+": value " + val + " not in " + objElement.value.toString()+";";
+                } else {
+                    err = tag+":"+objElement.name+": value " + val + " not in " + objElement.value.toString()+";";
+                }
+            }
+        }
+    }
+    return err;
+}
+
+function checkMandatory(tag, objElement, val, remDocID=null){
+    //console.log("checkMandatory: tag =" + tag + " objElement=" + JSON.stringify(objElement) + " val=" + val);
+    if(tag == 1500){
+      //console.log("val=" + val);     
+    }
+    let err = "";
+   
+    if( typeof val == 'undefined' || val === null || val === ""){
+        if(remDocID!==null){
+            err = tag+":"+remDocID+":"+objElement.name+": value is mandatory;";
+        } else {
+            err = tag+":"+objElement.name+": value is mandatory;";
+        }
+    }
+    // check if val exist in value array
+    //
+    else if(objElement.length !== null && val.length > objElement.length){
+        // check if length equals to value
+        if(remDocID!==null){
+            err = tag+":"+remDocID+":"+objElement.name+": value too long;";
+        } else {
+            err = tag+":"+objElement.name+": value too long;";
+        }
+    }
+    else {
+            let regex = objElement.value;
+            if(regex !== null && regex !== ''){
+                if(!val.match(regex)) {
+                    //console.log("checkMandatory: DID NOT found match val="+ val + " regEx=" + regex );
+                    if(remDocID!==null){
+                        err = tag+":"+remDocID+":"+objElement.name+": value " + val + " not in " + objElement.value.toString()+";";
+                    } else {
+                        err = tag+":"+objElement.name+": value " + val + " not in " + objElement.value.toString()+";";
+                    }
+                } else {
+                    //console.log("checkMandatory: found match val="+ val + " regEx=" + regex );
+                }
+            }
+    }
+    return err;
+}
+
+function checkOptional(tag, objElement, val, remDocID=null){
+    let err = "";
+    if(typeof val !== 'undefined'){
+        if(val !== null && val.length > objElement.length){
+            if(remDocID!==null){
+                err = tag+":"+remDocID+":"+objElement.name+": value too long;";
+            } else {
+                err = tag+":"+objElement.name+": value too long;";
+            }
+        }
+        if(val !== null && objElement.value !== ""){
+            let regex = objElement.value;
+            if(!val.match(regex)) {
+                if(remDocID!==null){
+                    err = tag+":"+remDocID+":"+objElement.name+": value " + val + " don't match " + objElement.value.toString()+";";
+                } else {
+                    err = tag+":"+objElement.name+": value " + val + " don't match " + objElement.value.toString()+";";
+                }      
+                //console.log("checkOptional: DID NOT found match val="+ val + " regEx=" + regex );
+            } else {
+                //console.log("checkOptional: found match val="+ val + " regEx=" + regex );
             }
         }
     }
