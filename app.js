@@ -2255,67 +2255,6 @@ console.log("Error:" + errorMsg);
 
 function checkMandatory(tag, objElement, val, remDocID=null){
     //console.log("checkMandatory: tag =" + tag + " objElement=" + JSON.stringify(objElement) + " val=" + val);
-
-    let err = "";
-   
-    if( typeof val == 'undefined' || val === null || val === ""){
-            if(remDocID!==null){
-                err = tag+":"+remDocID+" : "+objElement.name+": value is mandatory;";
-            } else {
-                err = tag+":"+objElement.name+": value is mandatory;";
-            }
-    }
-    // check if val exist in value array
-    //
-    else if(objElement.value !== "") {
-        var n = objElement.value.includes(val);
-        //console.log("checkMandatory exist : " + n);
-        if(n === false){
-            if(remDocID!==null){
-                err = tag+":"+remDocID+" : "+objElement.name+": value " + val + " not in " + objElement.value.toString()+";";
-            } else {
-                err = tag+":"+objElement.name+": value " + val + " not in " + objElement.value.toString()+";";
-            }
-        }
-    } else if(objElement.length !== null && val.length > objElement.length){
-        // check if length equals to value
-        if(remDocID!==null){
-            err = tag+":"+remDocID+" : "+objElement.name+": value too long;";
-        } else {
-            err = tag+":"+objElement.name+": value too long;";
-        }
-    }
-    
-    return err;
-}
-
-function checkOptional(tag, objElement, val, remDocID=null){
-    let err = "";
-    if(typeof val !== 'undefined'){
-        if(val !== null && val.length > objElement.length){
-            if(remDocID!==null){
-                err = tag+":"+remDocID+":"+objElement.name+": value too long;";
-            } else {
-                err = tag+":"+objElement.name+": value too long;";
-            }
-        }
-        if(val !== null && objElement.value !== ""){
-            var n = objElement.value.includes(val);
-            //console.log("checkMandatory exist : " + n);
-            if(n === false){
-                if(remDocID!==null){
-                    err = tag+":"+remDocID+":"+objElement.name+": value " + val + " not in " + objElement.value.toString()+";";
-                } else {
-                    err = tag+":"+objElement.name+": value " + val + " not in " + objElement.value.toString()+";";
-                }
-            }
-        }
-    }
-    return err;
-}
-
-function checkMandatory(tag, objElement, val, remDocID=null){
-    //console.log("checkMandatory: tag =" + tag + " objElement=" + JSON.stringify(objElement) + " val=" + val);
     if(tag == 1500){
       //console.log("val=" + val);     
     }
