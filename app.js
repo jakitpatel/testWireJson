@@ -15,38 +15,6 @@ for(var i = 0; i < fields.length; i++) {
     //console.log("element.len = "+ elementArr.length);
     errorMsg += verifytag(obj.tag, elementArr , wire);
     tagCnt = tagCnt +1;
-    /*
-    for(var j = 0; j < elementArr.length; j++) {
-        
-        var objElement = elementArr[j];
-        console.log(objElement.name);
-        let val = wire[objElement.name];
-        console.log("val =" + val);
-        
-        if(objElement.mandatory == 0){
-            let err1 = checkOptional(obj.tag, objElement, val);
-            if(err1 !== null){
-                errorMsg = errorMsg+err1;
-            }
-        }
-        else if(objElement.mandatory == 1){
-            let err1 = checkMandatory(obj.tag, objElement, val);
-            if(err1 !== null){
-                errorMsg = errorMsg+err1;
-            }
-        }
-        else if(objElement.mandatory == 2){
-            let err1 = checkSpecial(obj.tag, objElement, val, wire);
-            if(err1 !== null){
-                errorMsg = errorMsg+err1;
-            }
-        }
-        else {
-            if(err1 !== null){
-                errorMsg = errorMsg+obj.tag+":not valid mandatory value ";
-            }
-        }
-    }*/
 }
 
 function verify1500(tag, elementArr, wire) {
@@ -459,7 +427,7 @@ function verify4000(tag, elementArr, wire) {
         let intermediaryFICode = wire['intermediaryFICode'];
         let intermediaryFIIdentifier = wire['intermediaryFIIdentifier'];
         if(objElement.name === "intermediaryFICode"){
-            if(isExist(exchangeRate)){
+            if(isExist(intermediaryFICode)){
                 errTag = errTag + checkMandatory(tag, elementArr[1], intermediaryFIIdentifier);
                 errTag = errTag + checkMandatory(tag, elementArr[0], intermediaryFICode);
             }
@@ -1440,49 +1408,55 @@ function verify8300(tag, elementArr, wire) {
     let errTag = "";
     let busFunCode = wire['businessFunctionCode'];
     let localInstrumentCode = wire['localInstrumentCode'];
-    let remittanceOrignatorIDCode = wire['remittanceOrignatorIDCode'];
-    let remittanceOrignatorIDNumber = wire['remittanceOrignatorIDNumber'];
-    let remittanceOrignatorIDIssuer = wire['remittanceOrignatorIDIssuer'];
-    let remittanceOrignatorDatePlaceBirth = wire['remittanceOrignatorDatePlaceBirth'];
-    for(var j = 0; j < elementArr.length; j++) {
-        let objElement = elementArr[j];
-        let val = wire[objElement.name];
-        if(busFunCode !== "CTP" && localInstrumentCode !== "RMTS"){
-            if(isExist(val)){
-                errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = RMTS; ";
+    let remittanceArr = wire['wireRemittance_by_wireID'];
+    if(remittanceArr && remittanceArr.length>0){
+        let remittanceObj = remittanceArr[0];
+        let remittanceOrignatorIDCode = remittanceObj['remittanceOrignatorIDCode'];
+        let remittanceOrignatorIDNumber = remittanceObj['remittanceOrignatorIDNumber'];
+        let remittanceOrignatorIDIssuer = remittanceObj['remittanceOrignatorIDIssuer'];
+        let remittanceOrignatorDatePlaceBirth = remittanceObj['remittanceOrignatorDatePlaceBirth'];
+        for(var j = 0; j < elementArr.length; j++) {
+            let objElement = elementArr[j];
+            let val = remittanceObj[objElement.name];
+            if(busFunCode !== "CTP" && localInstrumentCode !== "RMTS"){
+                if(isExist(val)){
+                    errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = RMTS; ";
+                }
+            }
+            if(busFunCode == "CTP" && localInstrumentCode == "RMTS"){
+                if(objElement.name == "remittanceOrignatorIDType" || objElement.name == "remittanceOrignatorIDCode" || objElement.name == "remittanceOrignatorName"){
+                    errTag = errTag + checkMandatory(tag, objElement, val);
+                    //console.log(objElement.name +" : "+val+" : "+errTag);
+                } else if(objElement.name == "remittanceOrignatorIDNumber"){
+                    if(remittanceOrignatorIDCode !== "DPOB"){
+                        errTag = errTag + checkMandatory(tag, objElement, val);
+                    } else {
+                        errTag = errTag + checkOptional(tag, objElement, val);
+                    }
+                    if(isExist(remittanceOrignatorIDNumber) && remittanceOrignatorIDCode == "DPOB"){
+                        errTag = errTag + tag+ ": "+objElement.name+" is not permitted for Identification Code DPOB; ";
+                    }
+                } else if(objElement.name == "remittanceOrignatorIDIssuer"){
+                    if(isExist(remittanceOrignatorIDIssuer) && (remittanceOrignatorIDCode == "DPOB" || remittanceOrignatorIDCode == "SWBB")){
+                        errTag = errTag + tag+ ": "+objElement.name+" is not permitted for Identification Code DPOB & SWBB; ";
+                    } else {
+                        errTag = errTag + checkOptional(tag, objElement, val);
+                    }
+                } else if(objElement.name == "remittanceOrignatorDatePlaceBirth"){
+                    if(isExist(remittanceOrignatorDatePlaceBirth) && remittanceOrignatorIDCode !== "DPOB"){
+                        errTag = errTag + tag+ ": "+objElement.name+" is only permitted for Identification Code DPOB; ";
+                    } else {
+                        errTag = errTag + checkOptional(tag, objElement, val);
+                    }
+                } else {  
+                    errTag = errTag + checkOptional(tag, objElement, val);
+                }            
+            } else {
+                errTag = errTag + checkOptional(tag, objElement, val);
             }
         }
-        if(busFunCode == "CTP" && localInstrumentCode == "RMTS"){
-            if(objElement.name == "remittanceOrignatorIDType" || objElement.name == "remittanceOrignatorIDCode" || objElement.name == "remittanceOrignatorName"){
-                errTag = errTag + checkMandatory(tag, objElement, val);
-            } else if(objElement.name == "remittanceOrignatorIDNumber"){
-                if(remittanceOrignatorIDCode !== "DPOB"){
-                    errTag = errTag + checkMandatory(tag, objElement, val);
-                } else {
-                    errTag = errTag + checkOptional(tag, objElement, val);
-                }
-                if(isExist(remittanceOrignatorIDNumber) && remittanceOrignatorIDCode == "DPOB"){
-                    errTag = errTag + tag+ ": "+objElement.name+" is not permitted for Identification Code DPOB; ";
-                }
-            } else if(objElement.name == "remittanceOrignatorIDIssuer"){
-                if(isExist(remittanceOrignatorIDIssuer) && (remittanceOrignatorIDCode == "DPOB" || remittanceOrignatorIDCode == "SWBB")){
-                    errTag = errTag + tag+ ": "+objElement.name+" is not permitted for Identification Code DPOB & SWBB; ";
-                } else {
-                    errTag = errTag + checkOptional(tag, objElement, val);
-                }
-            } else if(objElement.name == "remittanceOrignatorDatePlaceBirth"){
-                if(isExist(remittanceOrignatorDatePlaceBirth) && remittanceOrignatorIDCode !== "DPOB"){
-                    errTag = errTag + tag+ ": "+objElement.name+" is only permitted for Identification Code DPOB; ";
-                } else {
-                    errTag = errTag + checkOptional(tag, objElement, val);
-                }
-            } else {  
-                errTag = errTag + checkOptional(tag, objElement, val);
-            }            
-        } else {
-            errTag = errTag + checkOptional(tag, objElement, val);
-        }
     }
+    //console.log("Final : errTag : "+errTag);
     return errTag;
 }
 
@@ -1511,53 +1485,57 @@ function verify8350(tag, elementArr, wire) {
     let errTag = "";
     let busFunCode = wire['businessFunctionCode'];
     let localInstrumentCode = wire['localInstrumentCode'];
-    let remittanceBeneficiaryName = wire['remittanceBeneficiaryName'];
-    let remittanceBeneficiaryIDCode = wire['remittanceBeneficiaryIDCode'];
-    let remittanceBeneficiaryDatePlaceBirth = wire['remittanceBeneficiaryDatePlaceBirth'];
-    let remittanceBeneficiaryIDNumber = wire['remittanceBeneficiaryIDNumber'];
-    let remittanceBeneficiaryIDType = wire['remittanceBeneficiaryIDType'];
-    let remittanceBeneficiaryIDIssuer = wire['remittanceBeneficiaryIDIssuer'];
+    let remittanceArr = wire['wireRemittance_by_wireID'];
+    if(remittanceArr && remittanceArr.length>0){
+        let remittanceObj = remittanceArr[0];
+        let remittanceBeneficiaryName = remittanceObj['remittanceBeneficiaryName'];
+        let remittanceBeneficiaryIDCode = remittanceObj['remittanceBeneficiaryIDCode'];
+        let remittanceBeneficiaryDatePlaceBirth = remittanceObj['remittanceBeneficiaryDatePlaceBirth'];
+        let remittanceBeneficiaryIDNumber = remittanceObj['remittanceBeneficiaryIDNumber'];
+        let remittanceBeneficiaryIDType = remittanceObj['remittanceBeneficiaryIDType'];
+        let remittanceBeneficiaryIDIssuer = remittanceObj['remittanceBeneficiaryIDIssuer'];
 
-    for(var j = 0; j < elementArr.length; j++) {
-        let objElement = elementArr[j];
-        let val = wire[objElement.name];
-        if(busFunCode !== "CTP" && localInstrumentCode !== "RMTS"){
-            if(isExist(val)){
-                errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = RMTS; ";
+        for(var j = 0; j < elementArr.length; j++) {
+            let objElement = elementArr[j];
+            let val = remittanceObj[objElement.name];
+            if(busFunCode !== "CTP" && localInstrumentCode !== "RMTS"){
+                if(isExist(val)){
+                    errTag = errTag + tag+ ": "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = RMTS; ";
+                }
             }
-        }
-        if(busFunCode == "CTP" && localInstrumentCode == "RMTS"){
-            if(objElement.name == "remittanceBeneficiaryName"){
-                errTag = errTag + checkMandatory(tag, objElement, val);
-            } else if(objElement.name == "remittanceBeneficiaryIDNumber"){
-                if(isExist(remittanceBeneficiaryIDNumber)){
-                    if(remittanceBeneficiaryIDType=="" || remittanceBeneficiaryIDType==null || remittanceBeneficiaryIDCode=="" || remittanceBeneficiaryIDCode==null){
-                        errTag = errTag + tag+ ": "+objElement.name+" is not permitted unless Identification Type and Identification Code are present; ";
+            if(busFunCode == "CTP" && localInstrumentCode == "RMTS"){
+                if(objElement.name == "remittanceBeneficiaryName"){
+                    errTag = errTag + checkMandatory(tag, objElement, val);
+                } else if(objElement.name == "remittanceBeneficiaryIDNumber"){
+                    if(isExist(remittanceBeneficiaryIDNumber)){
+                        if(remittanceBeneficiaryIDType=="" || remittanceBeneficiaryIDType==null || remittanceBeneficiaryIDCode=="" || remittanceBeneficiaryIDCode==null){
+                            errTag = errTag + tag+ ": "+objElement.name+" is not permitted unless Identification Type and Identification Code are present; ";
+                        }
                     }
-                }
-                if(typeof remittanceBeneficiaryIDNumber !== 'undefined' && remittanceBeneficiaryIDNumber !== null && remittanceBeneficiaryIDNumber !== "" && remittanceBeneficiaryIDCode == "DPOB"){
-                    errTag = errTag + tag+ ": "+objElement.name+" is not permitted for Identification Code DPOB; ";
-                }
-            }  else if(objElement.name == "remittanceBeneficiaryIDIssuer"){
-                if(typeof remittanceBeneficiaryIDIssuer !== 'undefined' && remittanceBeneficiaryIDIssuer !== null && remittanceBeneficiaryIDIssuer !== ""){
-                    if(remittanceBeneficiaryIDType=="" || remittanceBeneficiaryIDType==null || remittanceBeneficiaryIDCode=="" || remittanceBeneficiaryIDCode==null || remittanceBeneficiaryIDNumber=="" || remittanceBeneficiaryIDNumber==null){
-                        errTag = errTag + tag+ ": "+objElement.name+" is Not permitted unless Identification Type, Identification Code and Identification Number are present; ";
+                    if(typeof remittanceBeneficiaryIDNumber !== 'undefined' && remittanceBeneficiaryIDNumber !== null && remittanceBeneficiaryIDNumber !== "" && remittanceBeneficiaryIDCode == "DPOB"){
+                        errTag = errTag + tag+ ": "+objElement.name+" is not permitted for Identification Code DPOB; ";
                     }
-                }
-                if(typeof remittanceBeneficiaryIDIssuer !== 'undefined' && remittanceBeneficiaryIDIssuer !== null && remittanceBeneficiaryIDIssuer !== "" && (remittanceBeneficiaryIDCode == "DPOB" || remittanceBeneficiaryIDCode == "SWBB")){
-                    errTag = errTag + tag+ ": "+objElement.name+" is not permitted for Identification Code SWBB and DPOB; ";
-                }
-            } else if(objElement.name == "remittanceBeneficiaryDatePlaceBirth"){
-                if(typeof remittanceBeneficiaryDatePlaceBirth !== 'undefined' && remittanceBeneficiaryDatePlaceBirth !== null && remittanceBeneficiaryDatePlaceBirth !== "" && remittanceBeneficiaryIDCode !== "DPOB"){
-                    errTag = errTag + tag+ ": "+objElement.name+" is only permitted for Identification Code DPOB; ";
-                } else {
+                }  else if(objElement.name == "remittanceBeneficiaryIDIssuer"){
+                    if(typeof remittanceBeneficiaryIDIssuer !== 'undefined' && remittanceBeneficiaryIDIssuer !== null && remittanceBeneficiaryIDIssuer !== ""){
+                        if(remittanceBeneficiaryIDType=="" || remittanceBeneficiaryIDType==null || remittanceBeneficiaryIDCode=="" || remittanceBeneficiaryIDCode==null || remittanceBeneficiaryIDNumber=="" || remittanceBeneficiaryIDNumber==null){
+                            errTag = errTag + tag+ ": "+objElement.name+" is Not permitted unless Identification Type, Identification Code and Identification Number are present; ";
+                        }
+                    }
+                    if(typeof remittanceBeneficiaryIDIssuer !== 'undefined' && remittanceBeneficiaryIDIssuer !== null && remittanceBeneficiaryIDIssuer !== "" && (remittanceBeneficiaryIDCode == "DPOB" || remittanceBeneficiaryIDCode == "SWBB")){
+                        errTag = errTag + tag+ ": "+objElement.name+" is not permitted for Identification Code SWBB and DPOB; ";
+                    }
+                } else if(objElement.name == "remittanceBeneficiaryDatePlaceBirth"){
+                    if(typeof remittanceBeneficiaryDatePlaceBirth !== 'undefined' && remittanceBeneficiaryDatePlaceBirth !== null && remittanceBeneficiaryDatePlaceBirth !== "" && remittanceBeneficiaryIDCode !== "DPOB"){
+                        errTag = errTag + tag+ ": "+objElement.name+" is only permitted for Identification Code DPOB; ";
+                    } else {
+                        errTag = errTag + checkOptional(tag, objElement, val);
+                    }
+                } else {  
                     errTag = errTag + checkOptional(tag, objElement, val);
-                }
-            } else {  
+                }            
+            } else {
                 errTag = errTag + checkOptional(tag, objElement, val);
-            }            
-        } else {
-            errTag = errTag + checkOptional(tag, objElement, val);
+            }
         }
     }
     return errTag;
@@ -1818,7 +1796,7 @@ function verifytag(tag, elementArr, wire){
 }
 //console.log("Total Tag Count:" + tagCnt);
 //console.log("\n");
-//console.log("Error:" + errorMsg);
+console.log("Error:" + errorMsg);
 //console.log("\n");
 
 function checkMandatory(tag, objElement, val){
