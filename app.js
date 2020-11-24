@@ -1579,9 +1579,9 @@ function verify8400(tag, elementArr, wire) {
                 let remDocObj = remDocArr[k];
                 let wireDocID = remDocObj['wireDocID'];
                 let primaryDocumentTypeCode = remDocObj['primaryDocumentTypeCode'];
-                let primaryDocumentProprietary = remittanceObj['primaryDocumentProprietary'];
-                let primaryDocumentID = remittanceObj['primaryDocumentID'];
-                let primaryDocumentIssuer = remittanceObj['primaryDocumentIssuer'];
+                let primaryDocumentProprietary = remDocObj['primaryDocumentProprietary'];
+                let primaryDocumentID = remDocObj['primaryDocumentID'];
+                let primaryDocumentIssuer = remDocObj['primaryDocumentIssuer'];
 
                 for(var j = 0; j < elementArr.length; j++) {
                     let objElement = elementArr[j];
@@ -1601,6 +1601,161 @@ function verify8400(tag, elementArr, wire) {
                             if(primaryDocumentTypeCode === "PROP"){
                                 errTag = errTag + checkMandatory(tag, objElement, val, wireDocID);
                             } 
+                        } else {  
+                            errTag = errTag + checkOptional(tag, objElement, val, wireDocID);
+                        }            
+                    } else {
+                        errTag = errTag + checkOptional(tag, objElement, val, wireDocID);
+                    }
+                }
+            }
+        }
+    }
+    return errTag;
+}
+
+function verify8450(tag, elementArr, wire) {
+    /*{8450} Actual Amount Paid
+        Currency Code (3 characters)
+        Amount (19 characters)
+        Format: Must contain at least one numeric character and only one
+        decimal period marker (e.g., $1,234.56 should be entered as
+        1234.56). Can have up to 5 numeric characters following the
+        decimal period marker (e.g., 1234.56789). Amount must be greater
+        than zero (i.e., at least .01). 
+        Must be present if {3600} is CTP and {3610} is RMTS; otherwise not permitted.
+        Currency Code and Amount are mandatory for each set of remittance data.*/
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    let remittanceArr = wire['wireRemittance_by_wireID'];
+    if(remittanceArr && remittanceArr.length>0){
+        let remittanceObj = remittanceArr[0];
+        let remDocArr = remittanceObj['wireRemittanceDoc_by_wireRemittanceID'];
+        if(remDocArr && remDocArr.length>0){
+            for(var k = 0; k < remDocArr.length; k++) {
+                let remDocObj = remDocArr[k];
+                let wireDocID = remDocObj['wireDocID'];
+                let actualPaidCurrency = remDocObj['actualPaidCurrency'];
+                let actualPaidAmount = remDocObj['actualPaidAmount'];
+
+                for(var j = 0; j < elementArr.length; j++) {
+                    let objElement = elementArr[j];
+                    let val = remDocObj[objElement.name];
+                    if(busFunCode !== "CTP" && localInstrumentCode !== "RMTS"){
+                        if(isExist(val)){
+                            errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = RMTS; ";
+                        }
+                    }
+                    if(busFunCode == "CTP" && localInstrumentCode == "RMTS"){
+                        if(objElement.name == "actualPaidCurrency" || objElement.name == "actualPaidAmount"){
+                            errTag = errTag + checkMandatory(tag, objElement, val, wireDocID);
+                            if(objElement.name === "actualPaidAmount"){
+                                let numeric = /^[0-9][0-9.]*$/;
+                                if(isExist(val)){
+                                    if(!val.match(numeric)) {
+                                        errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" : only allowed [0-9][0-9.]*; ";
+                                    }
+                                }
+                            }
+                        } else {  
+                            errTag = errTag + checkOptional(tag, objElement, val, wireDocID);
+                        }            
+                    } else {
+                        errTag = errTag + checkOptional(tag, objElement, val, wireDocID);
+                    }
+                }
+            }
+        }
+    }
+    return errTag;
+}
+
+function verify8500(tag, elementArr, wire) {
+    /*{8500} Gross Amount of Remittance Document
+        Currency Code (3 characters)
+        Amount (19 characters) See tag {8450} for proper format.
+        {3600} must be CTP and {3610} must be RMTS; otherwise not permitted
+    */
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    let remittanceArr = wire['wireRemittance_by_wireID'];
+    if(remittanceArr && remittanceArr.length>0){
+        let remittanceObj = remittanceArr[0];
+        let remDocArr = remittanceObj['wireRemittanceDoc_by_wireRemittanceID'];
+        if(remDocArr && remDocArr.length>0){
+            for(var k = 0; k < remDocArr.length; k++) {
+                let remDocObj = remDocArr[k];
+                let wireDocID = remDocObj['wireDocID'];
+                let grossAmountCurrency = remDocObj['grossAmountCurrency'];
+                let grossAmountAmount = remDocObj['grossAmountAmount'];
+
+                for(var j = 0; j < elementArr.length; j++) {
+                    let objElement = elementArr[j];
+                    let val = remDocObj[objElement.name];
+                    if(busFunCode !== "CTP" && localInstrumentCode !== "RMTS"){
+                        if(isExist(val)){
+                            errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = RMTS; ";
+                        }
+                    }
+                    if(busFunCode == "CTP" && localInstrumentCode == "RMTS"){
+                        if(objElement.name == "grossAmountAmount"){
+                            let numeric = /^[0-9][0-9.]*$/;
+                            if(isExist(val)){
+                                if(!val.match(numeric)) {
+                                    errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" : only allowed [0-9][0-9.]*; ";
+                                }
+                            }
+                        } else {  
+                            errTag = errTag + checkOptional(tag, objElement, val, wireDocID);
+                        }            
+                    } else {
+                        errTag = errTag + checkOptional(tag, objElement, val, wireDocID);
+                    }
+                }
+            }
+        }
+    }
+    return errTag;
+}
+
+function verify8550(tag, elementArr, wire) {
+    /*{8550} Amount of Negotiated Discount
+        Currency Code (3 characters)
+        Amount (19 characters) See tag {8450} for proper format
+        {3600} must be CTP and {3610} must be RMTS; otherwise not permitted
+    */
+    let errTag = "";
+    let busFunCode = wire['businessFunctionCode'];
+    let localInstrumentCode = wire['localInstrumentCode'];
+    let remittanceArr = wire['wireRemittance_by_wireID'];
+    if(remittanceArr && remittanceArr.length>0){
+        let remittanceObj = remittanceArr[0];
+        let remDocArr = remittanceObj['wireRemittanceDoc_by_wireRemittanceID'];
+        if(remDocArr && remDocArr.length>0){
+            for(var k = 0; k < remDocArr.length; k++) {
+                let remDocObj = remDocArr[k];
+                let wireDocID = remDocObj['wireDocID'];
+                let discountCurrency = remDocObj['discountCurrency'];
+                let discountAmount = remDocObj['discountAmount'];
+
+                for(var j = 0; j < elementArr.length; j++) {
+                    let objElement = elementArr[j];
+                    let val = remDocObj[objElement.name];
+                    if(busFunCode !== "CTP" && localInstrumentCode !== "RMTS"){
+                        if(isExist(val)){
+                            errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" is only allowed if 3600.businessFunctionCode = CTP & 3610.localInstrumentCode = RMTS; ";
+                        }
+                    }
+                    if(busFunCode == "CTP" && localInstrumentCode == "RMTS"){
+                        if(objElement.name == "discountAmount"){
+                            let numeric = /^[0-9][0-9.]*$/;
+                            if(isExist(val)){
+                                if(!val.match(numeric)) {
+                                    errTag = errTag + tag+ ": "+wireDocID+" : "+objElement.name+" : only allowed [0-9][0-9.]*; ";
+                                }
+                            }
                         } else {  
                             errTag = errTag + checkOptional(tag, objElement, val, wireDocID);
                         }            
