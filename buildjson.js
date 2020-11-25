@@ -5,6 +5,7 @@ st += "{4200}D8310613143*KNOWLEABCMARKET LIMITED*UNIT NO. 604-555,4G OPAL TOWER,
 st += "{1500}30        P \r\n";
 st += "{3700}SUSD0,00*{8300}OIPROPJohn*78653*78653*AHMDB*BIZZ{8350}Shouki*OIPROP78653*78653*AHMDB*BIZZ{8400}AROIPDP*DIN*John*{8450}USD1234.56*{8500}USD1234.56*{8550}USD123.56*{8600}81CRDTUSD123.45*ADD*{8650}55201117{8700}AROIPDP*DIN*John*{8750}Free1*Free2*Free3*{8400}AROIPDP*DIN*Marry*{8450}USD4321.56*{1100}30P N\r\n";
 st += "{3700}SUSD0,00*{8300}OIPROPJohn*78653*78653*AHMDB*BIZZ{8350}Shouki*OIPROP78653*78653*AHMDB*BIZZ{8400}AROIPDP*DIN*Marry*{8450}USD4321.56*{1100}30P N";
+st = "{8300}OIPROPJohn*78653*78653**BIZZ";
 // convert line in fundwire protocol
 // into internal CSFB db format using JSON
 // conversion is being done using a dictionary retrieved from the database
@@ -107,16 +108,12 @@ function processObjToJson(inputObj,fields,processDoc){
                     let fieldName = el.name;
                     let len = el.length;
                     let fieldVal = '';
+                    let elLen = len;
                     //console.log("value : "+value);
                     //console.log("charCnt : "+charCnt);
                     let nextChar = value.substr(charCnt, 1);
                     //console.log("nextChar : "+nextChar);
-                    //Check for additional start at the end of value
-                    if(nextChar==="*"){
-                        charCnt = charCnt + 1;
-                    }
-                    nextChar = value.substr(charCnt, 1);
-                    //if(nextChar != " "){ // Skip the field if value is blank
+                    if(nextChar !== "*"){ // Skip the field if value is blank
                         //Get the Value by length of an element
                         fieldVal = value.substr(charCnt, len);
                         //console.log(fieldVal);
@@ -125,28 +122,37 @@ function processObjToJson(inputObj,fields,processDoc){
                             fieldVal = fieldVal.substr(0,index);
                             len = index+1;
                         }
-                   //}
-             
+                        let fieldLen = fieldVal.length;
                     
-                    if(fieldVal !== null && fieldVal !== "")
-                    {
-                        // sendersChargesAmount comes in n,nn notation 
-                        // we need to change to n.nn notation
-                        // this will be to sendersChargesAmount1, sendersChargesAmount2, etc.
-                        //
-                        if(fieldName.includes("sendersChargesAmount"))
-                            fieldVal = fieldVal.replace(",", ".");
-                        if((result.tag==="8300" || result.tag==="8350") && processDoc===false && el.section && el.section==="wireRemittance_by_wireID"){
-                            remittanceObj[fieldName] = fieldVal;
-                        } else if(el.section && el.section==="wireRemittanceDoc_by_wireRemittanceID"){
-                            if(processDoc===true){
+                        if(fieldVal !== null && fieldVal !== "")
+                        {
+                            // sendersChargesAmount comes in n,nn notation 
+                            // we need to change to n.nn notation
+                            // this will be to sendersChargesAmount1, sendersChargesAmount2, etc.
+                            //
+                            if(fieldName.includes("sendersChargesAmount"))
+                                fieldVal = fieldVal.replace(",", ".");
+                            if((result.tag==="8300" || result.tag==="8350") && processDoc===false && el.section && el.section==="wireRemittance_by_wireID"){
+                                remittanceObj[fieldName] = fieldVal;
+                            } else if(el.section && el.section==="wireRemittanceDoc_by_wireRemittanceID"){
+                                if(processDoc===true){
+                                    outputObj[fieldName] = fieldVal;
+                                }
+                            } else {
                                 outputObj[fieldName] = fieldVal;
                             }
-                        } else {
-                            outputObj[fieldName] = fieldVal;
                         }
+                        charCnt = charCnt + parseInt(len);
+                        //console.log("End charCnt : "+charCnt);
+                        nextChar = value.substr(charCnt, 1);
+                        //console.log("nextChar : "+nextChar);
+                        //Check for additional start at the end of value
+                        if(nextChar==="*" && fieldLen===elLen){
+                            charCnt = charCnt + 1;
+                        }
+                    } else {
+                        charCnt = charCnt + 1;
                     }
-                    charCnt = charCnt + parseInt(len);
                 }
             }
         }
