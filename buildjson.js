@@ -108,7 +108,6 @@ function processObjToJson(inputObj,fields,processDoc){
                     let fieldName = el.name;
                     let len = el.length;
                     let fieldVal = '';
-                    let elLen = len;
                     //console.log("value : "+value);
                     //console.log("charCnt : "+charCnt);
                     let nextChar = value.substr(charCnt, 1);
@@ -122,7 +121,6 @@ function processObjToJson(inputObj,fields,processDoc){
                             fieldVal = fieldVal.substr(0,index);
                             len = index+1;
                         }
-                        let fieldLen = fieldVal.length;
                     
                         if(fieldVal !== null && fieldVal !== "")
                         {
@@ -143,13 +141,6 @@ function processObjToJson(inputObj,fields,processDoc){
                             }
                         }
                         charCnt = charCnt + parseInt(len);
-                        //console.log("End charCnt : "+charCnt);
-                        nextChar = value.substr(charCnt, 1);
-                        //console.log("nextChar : "+nextChar);
-                        //Check for additional start at the end of value
-                        if(nextChar==="*" && fieldLen===elLen){
-                            charCnt = charCnt + 1;
-                        }
                     } else {
                         charCnt = charCnt + 1;
                     }
