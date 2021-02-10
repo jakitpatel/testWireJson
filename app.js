@@ -669,6 +669,7 @@ function verify5000(tag, elementArr, wire) {
         } else {
             errTag = errTag + checkOptional(tag, objElement, val);
         }
+        /*
         // If 5100 is present then 5000 is mandatory
         if(isExist(originatorFICode)){
             if(!objElement.name.includes("originatorAddress")){
@@ -692,6 +693,70 @@ function verify5000(tag, elementArr, wire) {
             if(!objElement.name.includes("originatorAddress")){
                 errTag = errTag + checkMandatory(tag, objElement, val);
             }
+        }
+        */
+    }
+    let partyID = wire['partyID'];
+    let originatorName = wire['originatorName'];
+
+    //If 5100 present, {5000} (or {5010} if {3600} is CTP) is mandatory
+
+    if(typeof originatorFICode !== 'undefined' && originatorFICode !== null && originatorFICode !== ""){
+        //check if 5000 is present
+        let found5000 = false;
+        let found5010 = false;
+        if(typeof originatorName !== 'undefined' && originatorName !== null && originatorName !== ""){
+            found5000 = true;
+        }
+        if(!found5000){
+            // check for 5010 is present if 3600 is CTP
+            if(busFunCode=="CTP" && (typeof partyID !== 'undefined' && partyID !== null && partyID !== "")){
+                found5010 = true;
+            }
+        }
+        if(!found5010 && !found5000){
+            errTag = errTag + "If 5100 present, {5000} (or {5010} if {3600} is CTP) is mandatory";
+        }
+    }
+
+    //If 5200 present, {5000} (or {5010} if {3600} is CTP) is mandatory
+
+    if(typeof instructingFICode !== 'undefined' && instructingFICode !== null && instructingFICode !== ""){
+        //check if 5000 is present
+        let found5000 = false;
+        let found5010 = false;
+        if(typeof originatorName !== 'undefined' && originatorName !== null && originatorName !== ""){
+            found5000 = true;
+        }
+        if(!found5000){
+            // check for 5010 is present if 3600 is CTP
+            if(busFunCode=="CTP" && (typeof partyID !== 'undefined' && partyID !== null && partyID !== "")){
+                found5010 = true;
+            }
+        }
+        if(!found5010 && !found5000){
+            errTag = errTag + "If 5200 present, {5000} (or {5010} if {3600} is CTP) is mandatory";
+        }
+    }
+
+
+    //If 6000 present, {5000} (or {5010} if {3600} is CTP) is mandatory
+
+    if(typeof originToBeneficiaryInfo1 !== 'undefined' && originToBeneficiaryInfo1 !== null && originToBeneficiaryInfo1 !== ""){
+        //check if 5000 is present
+        let found5000 = false;
+        let found5010 = false;
+        if(typeof originatorName !== 'undefined' && originatorName !== null && originatorName !== ""){
+            found5000 = true;
+        }
+        if(!found5000){
+            // check for 5010 is present if 3600 is CTP
+            if(busFunCode=="CTP" && (typeof partyID !== 'undefined' && partyID !== null && partyID !== "")){
+                found5010 = true;
+            }
+        }
+        if(!found5010 && !found5000){
+            errTag = errTag + "If 6000 present, {5000} (or {5010} if {3600} is CTP) is mandatory";
         }
     }
     return errTag;
